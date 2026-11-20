@@ -39,37 +39,40 @@ export default function BookDetail() {
   }
 
   return (
-    <section className="detail">
-      <div className="detail-img">
-        {book.coverImageUrl ? (
-          <img
-            src={book.coverImageUrl}
-            alt={`${book.title} 표지`}
-          />
-        ) : (
-          <span>표지 없음</span>
-        )}
-      </div>
-
-      <div className="detail-body">
-        <div className='detail-body-title'>
-          <h2>{book.title}</h2>
-          <h3 className="muted">{book.author}</h3>
-          <p className="muted">
-            작성 {new Date(book.createdAt).toLocaleString('ko-KR')} · 수정 {new Date(book.updatedAt).toLocaleString('ko-KR')}
-          </p>
+    <div className='book-detail-section'>
+      <h2>도서 정보</h2>
+      <section className="detail">
+        <div className="detail-img">
+          {book.coverImageUrl ? (
+            <img
+              src={book.coverImageUrl}
+              alt={`${book.title} 표지`}
+            />
+          ) : (
+            <span>표지 없음</span>
+          )}
         </div>
-        <p className="detail-content">{book.content}</p>
-        {error && <p className="error">{error}</p>}
 
-        <div className="detail-buttons">
-          <Link to={`/books/${book.id}/edit`} className="btn btn-primary">수정</Link>
-          <button className="btn btn-danger" type="button" onClick={handleDelete} disabled={deleting}>
-            삭제
-          </button>
-          {/* <button className="btn btn-primary" type="button" disabled>AI 표지 생성</button> */}
+        <div className="detail-body">
+          <div className='detail-body-title'>
+            <h2>{book.title}</h2>
+            <h3 className="muted">{book.author}</h3>
+            <p className="muted">
+              작성 {new Date(book.createdAt).toLocaleString('ko-KR')} · 수정 {new Date(book.updatedAt).toLocaleString('ko-KR')}
+            </p>
+          </div>
+          <p className="detail-content">{book.content}</p>
+          {error && <p className="error">{error}</p>}
+
+          <div className="detail-buttons">
+            <Link to={`/books/${book.id}/edit`} className="btn btn-primary">수정</Link>
+            <button className="btn btn-danger" type="button" onClick={handleDelete} disabled={deleting}>
+              삭제
+            </button>
+            {/* <button className="btn btn-primary" type="button" disabled>AI 표지 생성</button> */}
+          </div>
         </div>
-      </div>
-    </section>
+      </section>
+    </div>
   )
 }
