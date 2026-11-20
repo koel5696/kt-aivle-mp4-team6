@@ -1,0 +1,16 @@
+.book-list-section {
+    padding-top: 20px;
+}
+
+.page-title { 
+    display: flex; 
+    align-items: center; 
+    justify-content: space-between; 
+}
+
+.book-grid {
+    padding-top: 16px;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: 32px 20px;
+}

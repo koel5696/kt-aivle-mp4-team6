@@ -3,6 +3,7 @@ import { Link, useSearchParams } from 'react-router-dom'
 import { getBooksPage } from '../api/books.js'
 import BookCard from '../components/BookCard.jsx'
 import Pagination from '../components/Pagination.jsx'
+import '../styles/BookList.css'
 
 const PAGE_SIZE = 10 // 한 페이지에 보여줄 도서 수
 
@@ -52,9 +53,9 @@ export default function BookList() {
   }
 
   return (
-    <section>
+    <section className='book-list-section'>
       <div className="page-title">
-        <h2>도서 목록</h2>
+        <h2>나의 책장</h2>
         <Link to="/books/new" className="btn">신규 등록</Link>
       </div>
 
