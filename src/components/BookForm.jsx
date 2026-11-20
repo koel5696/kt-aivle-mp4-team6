@@ -25,7 +25,7 @@ export default function BookForm({
                         <button className="btn btn-primary" type="submit" disabled={submitting}>
                             생성
                         </button>
-                        <button className="btn" type="submit" disabled={submitting}>
+                        <button className="btn btn-danger" type="submit" disabled={submitting}>
                             재생성
                         </button>
                     </div>
