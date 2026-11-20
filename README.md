@@ -1,4 +1,4 @@
-# 📚 AI 표지 생성 도서관리 시스템
+# 📚 걷기가 서재 — AI 표지 생성 도서관리 시스템
 
 > KT AIVLE School AI 트랙 02반 6조 · 미니프로젝트 4차
 > 도서를 등록·조회·수정·삭제하고, OpenAI GPT Image로 도서 내용에 어울리는 표지를 자동 생성하는 React 웹 애플리케이션
@@ -23,10 +23,10 @@
 | 구분 | 기술 |
 |---|---|
 | Frontend | React 19, Vite, React Router, fetch API |
-| Mock Server | json-server 0.17.4 (로컬 REST API) |
+| Mock Server | json-server 0.17.4 (로컬 REST API, devDependency) |
 | AI | OpenAI API — GPT Image 2 |
-| 협업 | GitHub |
-| 배포 | Vercel (예정) |
+| 협업 | GitHub (이슈 · PR 템플릿, GitHub Actions CI: lint → build) |
+| 배포 | Vercel (프론트엔드만 배포, json-server는 로컬 실행) |
 
 <br>
 
@@ -203,15 +203,14 @@
 
 ```bash
 # 1. 저장소 클론
-git clone https://github.com/{organization}/kt-aivle-mp4-team6.git
+git clone https://github.com/koel5696/kt-aivle-mp4-team6.git
 cd kt-aivle-mp4-team6
 
-# 2. 패키지 설치
+# 2. 패키지 설치 (json-server 0.17.4 포함, 전역 설치 불필요)
 npm install
-npm install -g json-server@0.17.4   # json-server 전역 설치 (최초 1회)
 
 # 3. json-server 실행 (터미널 1)
-json-server --watch db.json --port 3000   # 또는 npm run server
+npm run server   # = json-server --watch db.json --port 3000
 # → http://localhost:3000/books
 
 # 4. React 개발 서버 실행 (터미널 2)
@@ -221,6 +220,13 @@ npm run dev
 
 > ⚠️ 두 서버를 **동시에** 실행해야 합니다.
 > ⚠️ OpenAI API Key는 화면의 입력창에 직접 입력하며, 코드나 GitHub에 절대 올리지 않습니다.
+> 💡 Windows PowerShell에서 `npm` 실행이 보안 오류로 막히면 `npm.cmd install`, `npm.cmd run server`, `npm.cmd run dev` 처럼 `npm.cmd`로 실행합니다.
+
+### Vercel 배포본 사용 시
+
+- 배포본은 화면(프론트엔드)만 올라가 있고, 데이터는 브라우저에서 **내 PC의 `http://localhost:3000`(json-server)** 으로 요청합니다.
+- 따라서 배포본을 열기 전에 로컬에서 `npm run server`를 실행해 두어야 하며, Chrome의 "이 기기의 다른 앱 및 서비스에 액세스" 권한 요청에서 **허용**을 눌러야 합니다.
+- 데이터는 각자 PC의 `db.json`에 저장되므로 팀원끼리 공유되지 않습니다.
 
 <br>
 
@@ -228,37 +234,43 @@ npm run dev
 
 ```
 kt-aivle-mp4-team6/
+├── .github/               # 이슈 · PR 템플릿, CI 워크플로우
 ├── db.json                # json-server 데이터
 ├── index.html
 ├── package.json
 ├── vite.config.js
+├── public/
+│   ├── favicon.png        # 파비콘
+│   └── logo.png           # 헤더 로고
 └── src/
     ├── App.jsx            # 라우터 설정
     ├── main.jsx           # BrowserRouter 적용
-    ├── index.css          # 공통 스타일
+    ├── index.css          # 공통 스타일 (레이아웃 · 카드 · 폼)
     ├── api/
-    │   └── books.js       # API URL 상수, fetch 함수 (2일차)
+    │   └── books.js       # API_BASE 상수, 공통 request + GET / POST / PATCH / DELETE 함수
     ├── data/
-    │   └── mockBooks.js   # 1일차 Mock 데이터
+    │   └── mockBooks.js   # 1일차 Mock 데이터 (현재 미사용)
     ├── components/
     │   ├── Header.jsx     # 로고 + 네비게이션
     │   └── BookCard.jsx   # 목록 카드
+    ├── styles/
+    │   └── Header.css     # 헤더 로고 스타일
     └── pages/
-        ├── BookList.jsx
-        ├── BookDetail.jsx
-        ├── BookCreate.jsx
-        └── BookEdit.jsx
+        ├── BookList.jsx   # 목록 (GET /books)
+        ├── BookDetail.jsx # 상세 · 삭제 (GET · DELETE /books/:id)
+        ├── BookCreate.jsx # 등록 폼 (POST /books)
+        └── BookEdit.jsx   # 수정 폼 (PATCH /books/:id)
 ```
 
 <br>
 
 ## 📅 개발 일정
 
-| 일차 | 목표 | 주요 작업 |
-|---|---|---|
-| Day 1 | 기획 + 뼈대 | 요구사항 · db.json · UI 스케치, Vite + json-server 세팅, Mock 렌더링 |
-| Day 2 | CRUD 완성 | GET 조회 연동, POST / PATCH / DELETE 연동, 폼 상태관리 |
-| Day 3 | AI + 발표 | GPT Image 연동, 표지 저장, 에러 처리, 발표자료 |
+| 일차 | 목표 | 주요 작업 | 진행 상황 |
+|---|---|---|---|
+| Day 1 | 기획 + 뼈대 | 요구사항 · db.json · UI 스케치, Vite + json-server 세팅, Mock 렌더링 | ✅ 완료 |
+| Day 2 | CRUD 완성 | GET 조회 연동, POST / PATCH / DELETE 연동, 폼 상태관리 | 🚧 CRUD API 연동 뼈대 완료 |
+| Day 3 | AI + 발표 | GPT Image 연동, 표지 저장, 에러 처리, 발표자료 | ⏳ 예정 |
 
 <br>
 
