@@ -1,11 +1,29 @@
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
-import mockBooks from '../data/mockBooks.js'
+import { getBooks } from '../api/books.js'
 import BookCard from '../components/BookCard.jsx'
 
-// F-01 도서 목록 — 1일차: Mock 데이터 렌더링
-// TODO(2일차 M3): useEffect + fetch로 GET /books 연동, 로딩 · 에러 · 빈 목록 처리
 export default function BookList() {
-  const books = mockBooks
+  const [books, setBooks] = useState([])
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState(null)
+
+  useEffect(() => {
+    let cancelled = false
+    getBooks()
+      .then((data) => {
+        if (!cancelled) setBooks(data)
+      })
+      .catch((err) => {
+        if (!cancelled) setError(err.message)
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false)
+      })
+    return () => {
+      cancelled = true
+    }
+  }, [])
 
   return (
     <section>
@@ -14,13 +32,17 @@ export default function BookList() {
         <Link to="/books/new" className="btn">신규 등록</Link>
       </div>
 
-      {books.length === 0 && <p>등록된 도서가 없습니다.</p>}
+      {loading && <p>불러오는 중…</p>}
+      {error && <p className="error">{error}</p>}
+      {!loading && !error && books.length === 0 && <p>등록된 도서가 없습니다.</p>}
 
-      <div className="book-grid">
-        {books.map((book) => (
-          <BookCard key={book.id} book={book} />
-        ))}
-      </div>
+      {!loading && !error && books.length > 0 && (
+        <div className="book-grid">
+          {books.map((book) => (
+            <BookCard key={book.id} book={book} />
+          ))}
+        </div>
+      )}
     </section>
   )
 }
