@@ -1,41 +1,41 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
-import { getBook, updateBook } from '../api/books.js'
+import { updateBook } from '../api/books.js'
+import useBook from '../hooks/useBook.js'
 
 export default function BookEdit() {
   const { id } = useParams()
-  const navigate = useNavigate()
-  const [book, setBook] = useState(null)
-  const [title, setTitle] = useState('')
-  const [author, setAuthor] = useState('')
-  const [content, setContent] = useState('')
-  const [error, setError] = useState(null)
-  const [loadedId, setLoadedId] = useState(null)
-  const [submitting, setSubmitting] = useState(false)
-  const loading = loadedId !== id
+  const { book, loading, error } = useBook(id)
 
-  useEffect(() => {
-    let cancelled = false
-    getBook(id)
-      .then((data) => {
-        if (cancelled) return
-        setBook(data)
-        setTitle(data.title)
-        setAuthor(data.author)
-        setContent(data.content)
-        setError(null)
-        setLoadedId(id)
-      })
-      .catch((err) => {
-        if (cancelled) return
-        setBook(null)
-        setError(err.message)
-        setLoadedId(id)
-      })
-    return () => {
-      cancelled = true
-    }
-  }, [id])
+  if (loading) {
+    return (
+      <section>
+        <h2>도서 수정</h2>
+        <p>불러오는 중…</p>
+      </section>
+    )
+  }
+
+  if (!book) {
+    return (
+      <section>
+        <h2>도서 수정</h2>
+        <p className="error">{error || '도서를 찾을 수 없습니다.'}</p>
+      </section>
+    )
+  }
+
+  // 불러온 도서로 폼 초기값을 채움 (key: 다른 도서로 이동하면 폼을 새로 만듦)
+  return <BookEditForm key={book.id} book={book} />
+}
+
+function BookEditForm({ book }) {
+  const navigate = useNavigate()
+  const [title, setTitle] = useState(book.title)
+  const [author, setAuthor] = useState(book.author)
+  const [content, setContent] = useState(book.content)
+  const [error, setError] = useState(null)
+  const [submitting, setSubmitting] = useState(false)
 
   async function handleSubmit(event) {
     event.preventDefault()
@@ -54,37 +54,19 @@ export default function BookEdit() {
     if (next.author !== book.author) patch.author = next.author
     if (next.content !== book.content) patch.content = next.content
     if (Object.keys(patch).length === 0) {
-      navigate(`/books/${id}`)
+      navigate(`/books/${book.id}`)
       return
     }
 
     setSubmitting(true)
     setError(null)
     try {
-      await updateBook(id, patch)
-      navigate(`/books/${id}`)
+      await updateBook(book.id, patch)
+      navigate(`/books/${book.id}`)
     } catch (err) {
       setError(err.message)
       setSubmitting(false)
     }
-  }
-
-  if (loading) {
-    return (
-      <section>
-        <h2>도서 수정</h2>
-        <p>불러오는 중…</p>
-      </section>
-    )
-  }
-
-  if (!book) {
-    return (
-      <section>
-        <h2>도서 수정</h2>
-        <p className="error">{error || '도서를 찾을 수 없습니다.'}</p>
-      </section>
-    )
   }
 
   return (
