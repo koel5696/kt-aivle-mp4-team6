@@ -1,6 +1,6 @@
 .footer {
-  margin-top: 64px;
-  border-top: 1px solid #e5e5e5;
+  margin-top: auto;
+  border-top: 1px solid var(--border);
   background: #fff;
 }
 
