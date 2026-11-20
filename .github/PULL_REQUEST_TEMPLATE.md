@@ -14,7 +14,7 @@ closes #
 > 리뷰어가 집중해서 봐줬으면 하는 부분
 
 ## 체크리스트
-- [ ] 브랜치(`feat/...`)와 커밋 메시지(`feat:` / `fix:` / `style:` / `docs:` / `chore:`)가 컨벤션에 맞나요?
+- [ ] 브랜치(`feat/...`)와 커밋 메시지(`feat:` / `fix:` / `refactor:` / `style:` / `docs:` / `chore:`)가 컨벤션에 맞나요?
 - [ ] 불필요한 코드(주석, `console.log`)를 제거했나요?
 - [ ] 브라우저에서 동작을 확인했나요? (`npm run dev` + json-server)
 - [ ] `npm run build`가 정상 동작하나요?
