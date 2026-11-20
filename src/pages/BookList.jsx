@@ -34,7 +34,12 @@ export default function BookList() {
 
       {loading && <p>불러오는 중…</p>}
       {error && <p className="error">{error}</p>}
-      {!loading && !error && books.length === 0 && <p>등록된 도서가 없습니다.</p>}
+      {!loading && !error && books.length === 0 && (
+        <div className="empty">
+          <p>아직 등록된 도서가 없어요</p>
+          <Link to="/books/new" className="btn">새 도서 등록</Link>
+        </div>
+      )}
 
       {!loading && !error && books.length > 0 && (
         <div className="book-grid">
