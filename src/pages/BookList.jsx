@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { getBooks } from '../api/books.js'
 import BookCard from '../components/BookCard.jsx'
+import '../styles/BookList.css'
 
 export default function BookList() {
   const [books, setBooks] = useState([])
@@ -28,7 +29,7 @@ export default function BookList() {
   return (
     <section>
       <div className="page-title">
-        <h2>도서 목록</h2>
+        <h2>나의 책장</h2>
         <Link to="/books/new" className="btn">신규 등록</Link>
       </div>
 
