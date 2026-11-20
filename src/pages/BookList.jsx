@@ -26,8 +26,14 @@ export default function BookList() {
     }
   }, [])
 
+  // [추가 구현] 책을 네 권씩 묶고, 선반은 최소 두 줄 준비
+  const shelves = Array.from(
+    { length: Math.max(2, Math.ceil(books.length / 4)) },
+    (_, index) => books.slice(index * 4, index * 4 + 4)
+  )
+
   return (
-    <section className='book-list-section'>
+    <section className="book-list-section">
       <div className="page-title">
         <h2>나의 책장</h2>
         <Link to="/books/new" className="btn">신규 등록</Link>
@@ -35,6 +41,7 @@ export default function BookList() {
 
       {loading && <p>불러오는 중…</p>}
       {error && <p className="error">{error}</p>}
+
       {!loading && !error && books.length === 0 && (
         <div className="empty">
           <p>아직 등록된 도서가 없어요</p>
@@ -42,10 +49,15 @@ export default function BookList() {
         </div>
       )}
 
+      {/*  선반별로 최대 네 권씩 표시하도록 변경  */}
       {!loading && !error && books.length > 0 && (
         <div className="book-grid">
-          {books.map((book) => (
-            <BookCard key={book.id} book={book} />
+          {shelves.map((shelfBooks, shelfIndex) => (
+            <div className="book-shelf" key={shelfIndex}>
+              {shelfBooks.map((book) => (
+                <BookCard key={book.id} book={book} />
+              ))}
+            </div>
           ))}
         </div>
       )}
