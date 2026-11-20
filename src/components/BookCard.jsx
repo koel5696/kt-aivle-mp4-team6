@@ -17,7 +17,7 @@ export default function BookCard({ book }) {
       </div>
       <div className="book-card-body">
         <h3>{book.title}</h3>
-        <p>{book.author}</p>
+        <h4>{book.author}</h4>
         <p>{new Date(book.createdAt).toLocaleDateString('ko-KR')}</p>
       </div>
     </Link>

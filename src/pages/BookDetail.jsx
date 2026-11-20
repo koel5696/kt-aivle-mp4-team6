@@ -21,7 +21,7 @@ export default function BookDetail() {
       <div className="detail-body">
         <h2>{book.title}</h2>
         <p className="muted">{book.author}</p>
-        <p className="muted small">
+        <p className="muted">
           작성일 {new Date(book.createdAt).toLocaleString('ko-KR')} · 수정일{' '}
           {new Date(book.updatedAt).toLocaleString('ko-KR')}
         </p>
