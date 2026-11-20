@@ -2,6 +2,18 @@
     background: #fff; 
     border: 1px solid var(--border); 
     overflow: hidden;
+    transition: transform 160ms ease, box-shadow 160ms ease;
+}
+.book-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.10);
+}
+.book-card:active {
+  transform: translateY(0) scale(0.99);
+}
+.book-card:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 3px;
 }
 
 .book-card-img {
