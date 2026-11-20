@@ -1,0 +1,25 @@
+.footer {
+  margin-top: 64px;
+  border-top: 1px solid #e5e5e5;
+  background: #fff;
+}
+
+.footer-inner {
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 24px 16px;
+  text-align: center;
+  color: #888;
+  font-size: 14px;
+}
+
+.footer-brand {
+  font-weight: 700;
+  color: #333;
+  margin-bottom: 4px;
+}
+
+.footer-copy {
+  margin-top: 8px;
+  font-size: 12px;
+}
