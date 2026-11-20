@@ -19,6 +19,9 @@
   display: flex;
   flex-direction: column;
 }
+html {
+  scrollbar-gutter: stable;
+}
 
 * { 
   box-sizing: border-box;
@@ -43,11 +46,13 @@ main {
 .btn {
   display: inline-block; 
   padding: 8px 14px; 
-  border: 1px solid var(--border);
+  border: 1px solid var(--muted);
   border-radius: 6px; 
   background: #fff; 
   cursor: pointer; 
+  color: var(--muted);
   font-size: 14px;
+  font-weight: 600;
   transition: transform 160ms ease, box-shadow 160ms ease;
 }
 .btn:hover:not(:disabled) {
@@ -62,25 +67,25 @@ main {
   cursor: not-allowed; 
 }
 .btn-primary { 
-  background: var(--primary); 
+  color: var(--primary); 
   border-color: var(--primary); 
-  color: #fff; 
 }
 .btn-danger { 
   color: var(--danger); 
-  border-color: var(--danger); 
+  border-color: var(--danger);
+  font-weight: 500;
 }
 
-.form { display: flex; flex-direction: column; gap: 14px; max-width: 640px; }
-.form label { display: flex; flex-direction: column; gap: 6px; font-size: 14px; }
-.form input, .form textarea {
-  font: inherit; padding: 8px 10px; border: 1px solid var(--border);
-  border-radius: 6px; background: #fff;
+.empty { 
+  display: flex; 
+  flex-direction: column; 
+  align-items: flex-start; 
+  gap: 12px;
 }
-.form textarea { min-height: 140px; resize: vertical; }
-.form .actions { margin-top: 0; }
-
-.empty { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; }
-
-.muted { color: var(--muted); margin: 0; }
-.error { color: var(--danger); }
+.muted { 
+  color: var(--muted); 
+  margin: 0; 
+}
+.error { 
+  color: var(--danger); 
+}

@@ -2,6 +2,8 @@ import { useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { updateBook } from '../api/books.js'
 import useBook from '../hooks/useBook.js'
+import BookForm from '../components/BookForm.jsx'
+import '../styles/BookForm.css'
 
 export default function BookEdit() {
   const { id } = useParams()
@@ -75,26 +77,8 @@ function BookEditForm({ book }) {
   }
 
   return (
-    <section>
-      <h2>도서 수정</h2>
-      <form className="form" onSubmit={handleSubmit}>
-        <label>
-          제목
-          <input value={title} onChange={(event) => setTitle(event.target.value)} />
-        </label>
-        <label>
-          저자
-          <input value={author} onChange={(event) => setAuthor(event.target.value)} />
-        </label>
-        <label>
-          내용
-          <textarea value={content} onChange={(event) => setContent(event.target.value)} />
-        </label>
-        {error && <p className="error">{error}</p>}
-        <div className="actions">
-          <button className="btn btn-primary" type="submit" disabled={submitting}>저장</button>
-        </div>
-      </form>
-    </section>
+    <BookForm heading={"도서 수정"} title={title} setTitle={setTitle} 
+      author={author} setAuthor={setAuthor} content={content} setContent={setContent}
+      error={error} submitting={submitting} onSubmit={handleSubmit} />
   )
 }
