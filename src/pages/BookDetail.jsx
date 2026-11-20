@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { deleteBook, getBook } from '../api/books.js'
+import { deleteBook } from '../api/books.js'
+import useBook from '../hooks/useBook.js'
 import '../styles/BookDetail.css'
 
 export default function BookDetail() {
