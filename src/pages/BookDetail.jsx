@@ -63,7 +63,7 @@ export default function BookDetail() {
         {error && <p className="error">{error}</p>}
 
         <div className="detail-buttons">
-          <Link to={`/books/${book.id}/edit`} className="btn">수정</Link>
+          <Link to={`/books/${book.id}/edit`} className="btn btn-primary">수정</Link>
           <button className="btn btn-danger" type="button" onClick={handleDelete} disabled={deleting}>
             삭제
           </button>
