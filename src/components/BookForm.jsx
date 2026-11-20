@@ -33,17 +33,17 @@ export default function BookForm({
                 <form className="form" onSubmit={onSubmit}>
                     <label>
                         책 제목
-                        <input value={title} onChange={(event) => setTitle(event.target.value)}/>
+                        <input value={title} onChange={(event) => setTitle(event.target.value)} placeholder="책의 제목을 작성해주세요."/>
                     </label>
 
                     <label>
                         저자
-                        <input value={author} onChange={(event) => setAuthor(event.target.value)}/>
+                        <input value={author} onChange={(event) => setAuthor(event.target.value)} placeholder="책의 저자를 작성해주세요."/>
                     </label>
 
                     <label>
                         내용
-                        <textarea value={content} onChange={(event) => setContent(event.target.value)}/>
+                        <textarea value={content} onChange={(event) => setContent(event.target.value)} placeholder="책의 내용을 작성해주세요."/>
                     </label>
 
                     {error && <p className="error">{error}</p>}
