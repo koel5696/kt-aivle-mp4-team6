@@ -78,11 +78,10 @@ main.container { padding-top: 24px; padding-bottom: 48px; }
   outline-offset: 3px;
 }
 
-/*
 .nav a {
   display: inline-block;
   transition: color 160ms ease, transform 160ms ease;
-} */
+}
 .nav a:hover,
 .nav a:focus-visible {
   color: var(--primary);
