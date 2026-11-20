@@ -9,7 +9,7 @@ export default function BookList() {
   const books = mockBooks
 
   return (
-    <section>
+    <section className='book-list-section'>
       <div className="page-title">
         <h2>나의 책장</h2>
         <Link to="/books/new" className="btn">신규 등록</Link>
