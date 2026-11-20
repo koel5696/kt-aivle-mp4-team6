@@ -45,7 +45,18 @@ export default function BookDetail() {
   }
 
   if (loading) return <p>불러오는 중…</p>
-  if (!book) return <p className="error">{error || '도서를 찾을 수 없습니다.'}</p>
+  if (!book) {
+    const message =
+      error === '서버에 연결할 수 없습니다' ? error : '도서를 찾을 수 없습니다'
+    return (
+      <section>
+        <p className="error">{message}</p>
+        <div className="actions">
+          <Link to="/" className="btn">목록으로</Link>
+        </div>
+      </section>
+    )
+  }
 
   return (
     <section className="detail">
