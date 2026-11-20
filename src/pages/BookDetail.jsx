@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { deleteBook } from '../api/books.js'
 import useBook from '../hooks/useBook.js'
+import '../styles/BookDetail.css'
 
 export default function BookDetail() {
   const { id } = useParams()
@@ -39,28 +40,34 @@ export default function BookDetail() {
 
   return (
     <section className="detail">
-      {book.coverImageUrl ? (
-        <img src={book.coverImageUrl} alt={`${book.title} 표지`} className="cover detail-cover" />
-      ) : (
-        <div className="cover cover-empty detail-cover">표지 없음</div>
-      )}
+      <div className="detail-img">
+        {book.coverImageUrl ? (
+          <img
+            src={book.coverImageUrl}
+            alt={`${book.title} 표지`}
+          />
+        ) : (
+          <span>표지 없음</span>
+        )}
+      </div>
 
       <div className="detail-body">
-        <h2>{book.title}</h2>
-        <p className="muted">{book.author}</p>
-        <p className="muted">
-          작성일 {new Date(book.createdAt).toLocaleString('ko-KR')} · 수정일{' '}
-          {new Date(book.updatedAt).toLocaleString('ko-KR')}
-        </p>
-        <p className="content">{book.content}</p>
+        <div className='detail-body-title'>
+          <h2>{book.title}</h2>
+          <h3 className="muted">{book.author}</h3>
+          <p className="muted">
+            작성 {new Date(book.createdAt).toLocaleString('ko-KR')} · 수정 {new Date(book.updatedAt).toLocaleString('ko-KR')}
+          </p>
+        </div>
+        <p className="detail-content">{book.content}</p>
         {error && <p className="error">{error}</p>}
 
-        <div className="actions">
+        <div className="detail-buttons">
           <Link to={`/books/${book.id}/edit`} className="btn">수정</Link>
           <button className="btn btn-danger" type="button" onClick={handleDelete} disabled={deleting}>
             삭제
           </button>
-          <button className="btn btn-primary" type="button" disabled>AI 표지 생성</button>
+          {/* <button className="btn btn-primary" type="button" disabled>AI 표지 생성</button> */}
         </div>
       </div>
     </section>
