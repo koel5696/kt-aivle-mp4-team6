@@ -10,15 +10,15 @@
 }
 
 .footer {
-  margin-top: 64px;
-  border-top: 1px solid #e5e5e5;
+  margin-top: 32px;
+  border-top: 1px solid var(--border);
   background: #fff;
 }
 
 .footer-inner {
   max-width: 1080px;
   margin: 0 auto;
-  padding: 24px 16px;
+  padding: 20px 12px;
   text-align: center;
   color: #888;
   font-size: 14px;
@@ -31,6 +31,6 @@
 }
 
 .footer-copy {
-  margin-top: 8px;
+  margin-top: 4px;
   font-size: 12px;
 }
