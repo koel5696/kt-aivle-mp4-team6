@@ -41,11 +41,11 @@
 }
 .nav a:hover,
 .nav a:focus-visible {
-  color: var(--primary);
+  color: #8a7868;
   transform: translateY(-2px);
 }
 .nav a:focus-visible {
-  outline: 2px solid var(--primary);
+  outline: 2px solid #8a7868;
   outline-offset: 4px;
   border-radius: 2px;
 }
