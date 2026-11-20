@@ -1,7 +1,10 @@
-/* [추가 구현] 목록 화면의 바깥 폭 제한을 넓혀 양옆 여백 축소 */
+/* [추가 구현] 목록 화면의 헤더와 본문 좌우 기준선 통일 */
+#root:has(.book-list-section) .header-inner.container,
 main.container:has(.book-list-section) {
   width: 100%;
   max-width: 1280px;
+  padding-left: 20px;
+  padding-right: 20px;
 }
 
 .book-list-section {
