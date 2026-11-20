@@ -1,3 +1,5 @@
+@import url('https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&display=swap');
+
 /* 기본 스타일 — 세부 스타일링은 추후 작업 */
 :root {
   --bg: #f7f7f5;
@@ -6,24 +8,28 @@
   --border: #e2e2e2;
   --primary: #3b5bdb;
   --danger: #e03131;
-  font-family: system-ui, -apple-system, 'Malgun Gothic', sans-serif;
+  font-family: 'Gowun Batang', serif;
+  font-weight: 400;
+  font-size: 16px;
   color: var(--text);
   background: var(--bg);
 }
 
-* { box-sizing: border-box; }
-body { margin: 0; }
-a { color: inherit; text-decoration: none; }
+* { 
+  box-sizing: border-box;
+  margin: 0;
+  border: 0;
+  color: inherit;
+  text-decoration: none;
+}
 
-.container { max-width: 1080px; margin: 0 auto; padding: 0 20px; }
-main.container { padding-top: 24px; padding-bottom: 48px; }
+.container { 
+  max-width: 1080px;
+  margin: 0 auto;
+  padding: 20px;
+}
 
-.header { background: #fff; border-bottom: 1px solid var(--border); }
-.header-inner { display: flex; align-items: center; justify-content: space-between; height: 60px; }
-.logo { font-weight: 700; font-size: 18px; }
-.nav { display: flex; gap: 16px; }
-.nav a { color: var(--muted); }
-.nav a.active { color: var(--text); font-weight: 600; }
+
 
 .page-title { display: flex; align-items: center; justify-content: space-between; }
 
