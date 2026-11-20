@@ -278,5 +278,5 @@ kt-aivle-mp4-team6/
 
 - 기능별 브랜치에서 작업: `feat/list`, `feat/detail`, `feat/form`, `feat/ai-cover` …
 - PR 생성 → 검토 담당(박시온) 확인 후 `main`에 merge
-- 커밋 메시지: `feat:` 기능 추가 / `fix:` 버그 수정 / `style:` 스타일 / `docs:` 문서
+- 커밋 메시지: `feat:` 기능 추가 / `fix:` 버그 수정 / `refactor:` 동작 변경 없는 코드 개선 / `style:` 스타일 / `docs:` 문서 / `chore:` 설정 · 기타
 - `node_modules`, `.env`는 커밋 금지 (`.gitignore` 확인)

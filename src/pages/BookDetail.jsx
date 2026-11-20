@@ -1,35 +1,14 @@
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { deleteBook, getBook } from '../api/books.js'
+import { deleteBook } from '../api/books.js'
+import useBook from '../hooks/useBook.js'
 
 export default function BookDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
-  const [book, setBook] = useState(null)
-  const [error, setError] = useState(null)
-  const [loadedId, setLoadedId] = useState(null)
+  const { book, loading, error: loadError } = useBook(id)
+  const [error, setError] = useState(null) // 삭제 실패 메시지
   const [deleting, setDeleting] = useState(false)
-  const loading = loadedId !== id
-
-  useEffect(() => {
-    let cancelled = false
-    getBook(id)
-      .then((data) => {
-        if (cancelled) return
-        setBook(data)
-        setError(null)
-        setLoadedId(id)
-      })
-      .catch((err) => {
-        if (cancelled) return
-        setBook(null)
-        setError(err.message)
-        setLoadedId(id)
-      })
-    return () => {
-      cancelled = true
-    }
-  }, [id])
 
   async function handleDelete() {
     if (!book || !window.confirm('이 도서를 삭제할까요?')) return
@@ -47,7 +26,7 @@ export default function BookDetail() {
   if (loading) return <p>불러오는 중…</p>
   if (!book) {
     const message =
-      error === '서버에 연결할 수 없습니다' ? error : '도서를 찾을 수 없습니다'
+      loadError === '서버에 연결할 수 없습니다' ? loadError : '도서를 찾을 수 없습니다'
     return (
       <section>
         <p className="error">{message}</p>
