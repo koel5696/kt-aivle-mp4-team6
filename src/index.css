@@ -35,11 +35,6 @@ main.container { padding-top: 24px; padding-bottom: 48px; }
 .btn-primary { background: var(--primary); border-color: var(--primary); color: #fff; }
 .btn-danger { color: var(--danger); border-color: var(--danger); }
 
-.book-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 20px; }
-.book-card { background: #fff; border: 1px solid var(--border); border-radius: 8px; overflow: hidden; }
-.book-card-body { padding: 10px 12px; }
-.book-card-body h3 { margin: 0 0 4px; font-size: 16px; }
-
 .cover { width: 100%; aspect-ratio: 2 / 3; object-fit: cover; display: block; }
 .cover-empty { display: flex; align-items: center; justify-content: center; background: #eee; color: var(--muted); }
 

@@ -1,6 +1,7 @@
 import { Link } from 'react-router-dom'
 import mockBooks from '../data/mockBooks.js'
 import BookCard from '../components/BookCard.jsx'
+import '../styles/BookList.css'
 
 // F-01 도서 목록 — 1일차: Mock 데이터 렌더링
 // TODO(2일차 M3): useEffect + fetch로 GET /books 연동, 로딩 · 에러 · 빈 목록 처리
@@ -10,7 +11,7 @@ export default function BookList() {
   return (
     <section>
       <div className="page-title">
-        <h2>도서 목록</h2>
+        <h2>나의 책장</h2>
         <Link to="/books/new" className="btn">신규 등록</Link>
       </div>
 
