@@ -21,6 +21,7 @@ export default function BookForm({
                     <div className="book-form-img">
                         <span>표지 없음</span>
                     </div>
+                    <input type="password" placeholder="API키를 입력하세요."/>
                     <div className="book-form-img-button">
                         <button className="btn btn-primary" type="submit" disabled={submitting}>
                             생성

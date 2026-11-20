@@ -33,6 +33,9 @@
     color: #8a7868;
     font-size: 14px;
 }
+.book-form-img-section input {
+    height: 36px;
+}
 .book-form-img-button {
     width: 100%;
     display: flex;
@@ -56,15 +59,18 @@
     gap: 6px; 
     font-size: 14px; 
 }
-.form input, .form textarea {
-    font: inherit; 
-    padding: 8px 10px; 
+.book-form-img-section input,
+.form input,
+.form textarea {
+    font: inherit;
+    font-size: 14px;
+    padding: 8px 10px;
     border: 1px solid var(--border);
-    border-radius: 6px; 
+    border-radius: 6px;
     background: #fff;
 }
 .form textarea { 
-    min-height: 160px; 
+    min-height: 240px; 
     resize: none; 
 }
 .book-form-button {
