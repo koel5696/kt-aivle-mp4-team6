@@ -61,3 +61,53 @@ main.container { padding-top: 24px; padding-bottom: 48px; }
 .muted { color: var(--muted); margin: 0; }
 .small { font-size: 13px; }
 .error { color: var(--danger); }
+
+/* [추가 구현] 클릭 가능한 요소의 가벼운 반응 */
+.book-card {
+  transition: transform 160ms ease, box-shadow 160ms ease;
+}
+.book-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.10);
+}
+.book-card:active {
+  transform: translateY(0) scale(0.99);
+}
+.book-card:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 3px;
+}
+
+/*
+.nav a {
+  display: inline-block;
+  transition: color 160ms ease, transform 160ms ease;
+} */
+.nav a:hover,
+.nav a:focus-visible {
+  color: var(--primary);
+  transform: translateY(-2px);
+}
+.nav a:focus-visible {
+  outline: 2px solid var(--primary);
+  outline-offset: 4px;
+  border-radius: 2px;
+}
+
+.logo {
+  transition: transform 160ms ease;
+}
+.logo:hover {
+  transform: translateY(-2px);
+}
+
+.btn {
+  transition: transform 160ms ease, box-shadow 160ms ease;
+}
+.btn:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 12px rgba(0, 0, 0, 0.10);
+}
+.btn:active:not(:disabled) {
+  transform: translateY(0) scale(0.98);
+}
