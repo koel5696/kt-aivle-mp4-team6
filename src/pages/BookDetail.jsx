@@ -45,16 +45,18 @@ export default function BookDetail() {
   const API_BASE = 'http://localhost:3000/books/'
 
   async function handleGenerateCover(){
+      
       const prompt = `
       #역할
       전문 책 표지 생성 AI
       #지침
       - 주어진 책 이름, 작가, 내용을 바탕으로 가장 적합한 책 표지 만들어
       - 책 이름, 작가 이름이 표지에 나오도록
-
+      - 
       제목: ${book.title}
       작가: ${book.author}
       내용: ${book.content}
+      
       `
       if(!apiKey.trim()) return;
 
@@ -77,11 +79,10 @@ export default function BookDetail() {
               output_format:'png'
           })
       });
-
+      console.log(res.json())
       if(!res.ok){ 
         setIsGenerating(false);
         throw new Error('OpenAI 표지 생성 불가...');
-        
       }
 
       const data = await res.json();
@@ -89,7 +90,7 @@ export default function BookDetail() {
 
       if(!b64Json){
         setIsGenerating(false);
-        throw new Error('no image found');
+        throw new Error('이미지 ');
       }
 
       const imageSrc = `data:image/png;base64,${b64Json}`;
@@ -104,6 +105,7 @@ export default function BookDetail() {
                   updatedAt: Date.now()
               }),
           });
+          navigate('/')
       }catch(e){
           console.log(e.message);
       }finally{
@@ -113,55 +115,77 @@ export default function BookDetail() {
   }
 
   return (
-    <section className="detail">
-      <div className="detail-img">
-        {book.coverImageUrl ? (
-          <img
-            src={book.coverImageUrl}
-            alt={`${book.title} 표지`}
-          />
-        ) : (
-          <span>표지 없음</span>
-        )}
-      </div>
-
-      <div className="detail-body">
-        <div className='detail-body-title'>
-          <h2>{book.title}</h2>
-          <h3 className="muted">{book.author}</h3>
-          <p className="muted">
-            작성 {new Date(book.createdAt).toLocaleString('ko-KR')} · 수정 {new Date(book.updatedAt).toLocaleString('ko-KR')}
-          </p>
+    <div className='book-detail-section'>
+      <h2>도서 정보</h2>
+      <section className="detail">
+        <div className="detail-img">
+          {book.coverImageUrl ? (
+            <img
+              src={book.coverImageUrl}
+              alt={`${book.title} 표지`}
+            />
+          ) : (
+            <span>표지 없음</span>
+          )}
         </div>
-        <p className="detail-content">{book.content}</p>
-        {error && <p className="error">{error}</p>}
 
-        <div className="detail-buttons">
-          <Link to={`/books/${book.id}/edit`} className="btn">수정</Link>
-          <button className="btn btn-danger" type="button" onClick={handleDelete} disabled={deleting}>
-            삭제
-          </button>
-          
-        </div>
-        <div className="genCover">
-          <div className = "apiDiv">
-          <label htmlFor="quality">API KEY:</label>
-          <input placeholder="OPENAI API KEY" type="password" value={apiKey} onChange={event=> setApiKey(event.target.value)}/>
+        <div className="detail-body">
+          <div className='detail-body-title'>
+            <h2>{book.title}</h2>
+            <h3 className="muted">{book.author}</h3>
+            <p className="muted">
+              작성 {new Date(book.createdAt).toLocaleString('ko-KR')} · 수정 {new Date(book.updatedAt).toLocaleString('ko-KR')}
+            </p>
           </div>
-          <div className='settingDiv'>
-          <label htmlFor="quality">표지 화질:</label>
-          <select id="qualitySelector" name="quality" onChange={event => setQuality(event.target.value)}>
-            <option value="low">Low</option>
-            <option value="medium">Medium</option>
-            <option value="high">High</option>
-            <option value="auto">Auto</option>
-          </select>
+          <p className="detail-content">{book.content}</p>
+          {error && <p className="error">{error}</p>}
+
+          <div className="detail-buttons">
+            <Link to={`/books/${book.id}/edit`} className="btn btn-primary">수정</Link>
+            <button className="btn btn-danger" type="button" onClick={handleDelete} disabled={deleting}>
+              삭제
+            </button>
           </div>
 
-          <button className="btn btn-primary" type="button" onClick={handleGenerateCover} disabled= {isGenerating}>
-            {isGenerating? "생성 중 ...": "AI 표지 생성"}</button>
+          <div className="book-form-img-section">
+              <input type="password" placeholder="API키를 입력하세요."  value={apiKey} onChange={event=> setApiKey(event.target.value)}/>
+              <label htmlFor="quality">표지 화질:</label>
+              <select id="qualitySelector" name="quality" onChange={event => setQuality(event.target.value)}>
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+                <option value="auto">Auto</option>
+              </select>
+              {console.log(quality)}
+              <div className="book-form-img-button">
+                  <button className="btn btn-primary" type="submit"  onClick={handleGenerateCover} disabled={isGenerating}>
+                    {isGenerating ? "생성 중 ...": "AI 표지 생성"} </button>
+                  <button className="btn btn-danger" type="submit"  onClick={handleGenerateCover} disabled={isGenerating}>
+                    {isGenerating ? "생성 중 ...": "AI 표지 재생성"} </button>
+              </div>
+          </div>
+
+
+          {/* <div className="genCover">
+            <div className = "apiDiv">
+              <label htmlFor="quality">API KEY:</label>
+              <input placeholder="OPENAI API KEY" type="password" value={apiKey} onChange={event=> setApiKey(event.target.value)}/>
+              <label htmlFor="quality">표지 화질:</label>
+              <select id="qualitySelector" name="quality" onChange={event => setQuality(event.target.value)}>
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+                <option value="auto">Auto</option>
+              </select>
+              
+            </div>
+            <div className="book-form-img-button">
+              <button className="btn btn-primary" type="button" onClick={handleGenerateCover} disabled= {isGenerating}>
+                {isGenerating? "생성 중 ...": "AI 표지 생성"}</button>
+            </div>
+          </div> */}
         </div>
-      </div>
-    </section>
+      </section>
+    </div>
   )
 }
