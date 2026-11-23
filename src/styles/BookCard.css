@@ -2,7 +2,7 @@
 .book-card {
   --card-w: var(--cover-w, 174px);
   --card-h: calc(var(--card-w) * 1.5);
-  --open-duration: 550ms;
+  --open-duration: 700ms;
 
   width: var(--card-w);
   display: flex;
@@ -283,16 +283,4 @@
   .book-card.is-opening .book-card-face {
     transform: rotateY(-115deg);
   }
-}
-
-/* 책 속으로 들어갈 때 화면을 덮는 속지 (BookCard.jsx에서 body에 붙였다가 제거) */
-.book-zoom-overlay {
-  position: fixed;
-  z-index: 9999;
-  border-radius: 2px 5px 5px 2px;
-  background:
-    radial-gradient(ellipse at center, #fffaf0 0%, #fbf6ec 55%, #f1e7d6 100%);
-  transform-origin: center;
-  pointer-events: none;
-  will-change: transform, opacity;
 }
