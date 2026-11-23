@@ -1,59 +1,137 @@
-.book-card { 
-    background: #fff; 
-    border: 1px solid var(--border); 
-    overflow: hidden;
-    transition: transform 160ms ease, box-shadow 160ms ease;
+/* [추가 구현] 조금 키운 고정 크기의 책 */
+.book-card {
+  position: relative;
+  z-index: 1;
+
+  width: 180px;
+  height: 272px;
+
+  display: flex;
+  flex-direction: column;
+
+  background: #fffdf8;
+  border: 1px solid rgba(81, 70, 49, 0.12);
+  overflow: hidden;
+
+  box-shadow:
+    2px 3px 3px rgba(48, 43, 33, 0.14),
+    7px 10px 14px rgba(48, 43, 33, 0.13);
+
+  transition:
+    transform 180ms ease,
+    box-shadow 180ms ease;
 }
+
 .book-card:hover {
   transform: translateY(-3px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.10);
+
+  box-shadow:
+    3px 5px 5px rgba(48, 43, 33, 0.14),
+    9px 14px 18px rgba(48, 43, 33, 0.15);
 }
+
 .book-card:active {
   transform: translateY(0) scale(0.99);
 }
+
 .book-card:focus-visible {
   outline: 2px solid var(--primary);
   outline-offset: 3px;
 }
 
+/* [추가 구현] 넓어진 책 크기에 맞춘 표지 */
 .book-card-img {
   width: 100%;
-  height: 280px;
-  min-height: 220px;
+  height: 212px;
+  min-height: 212px;
   flex-shrink: 0;
-  
+
   display: flex;
   justify-content: center;
   align-items: center;
 
-  margin-bottom: 8px;
-  background: #e0d8cd;
+  background: #ded8cb;
   overflow: hidden;
 }
+
 .book-card-img img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
 }
+
 .book-card-img span {
-  color: #8a7868;
-  font-size: 14px;
+  color: #857a67;
+  font-size: 12px;
 }
 
-.book-card-body { 
-  padding: 8px 12px; 
+/* [추가 구현] 표지 아래의 얇은 정보 영역 */
+.book-card-body {
+  flex: 1;
+  min-height: 0;
+  padding: 4px 9px;
 }
-.book-card-body h3 { 
-  margin: 0 0 4px; 
-  font-size: 16px;
+
+.book-card-body h3 {
+  margin: 0 0 2px;
+  font-size: 13px;
+  line-height: 1.2;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
+
 .book-card-body h4 {
-  font-size: 14px;
-  color: #777;
-}
-.book-card-body p {
   margin: 0 0 2px;
   font-size: 12px;
+  line-height: 1.2;
+  font-weight: 400;
   color: #777;
+
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.book-card-body p {
+  margin: 0;
+  font-size: 11px;
+  line-height: 1.2;
+  color: #888;
+}
+
+/* [추가 구현] 책장 배경색에 맞춘 오른쪽 아래 종이 모서리 */
+.book-card::after {
+  content: "";
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 0;
+  height: 0;
+  z-index: 3;
+
+  background: linear-gradient(
+    315deg,
+    #eeede8 43%,
+    #b8b8b3 49%,
+    #ededeb 55%,
+    #fffdf8 78%
+  );
+  box-shadow: -1px -1px 2px rgba(0, 0, 0, 0.12);
+
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    width 240ms ease,
+    height 240ms ease,
+    opacity 160ms ease;
+}
+
+.book-card:hover::after,
+.book-card:focus-visible::after {
+  width: 16px;
+  height: 16px;
+  opacity: 1;
 }

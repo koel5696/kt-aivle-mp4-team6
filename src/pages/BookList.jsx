@@ -5,10 +5,9 @@ import BookCard from '../components/BookCard.jsx'
 import Pagination from '../components/Pagination.jsx'
 import '../styles/BookList.css'
 
-const PAGE_SIZE = 10 // 한 페이지에 보여줄 도서 수
+const PAGE_SIZE = 8
 
 export default function BookList() {
-  // 현재 페이지는 URL(?page=2)에 보관 → 새로고침 · 뒤로가기 시에도 유지
   const [searchParams, setSearchParams] = useSearchParams()
   const page = Math.max(1, Number.parseInt(searchParams.get('page'), 10) || 1)
 
@@ -21,6 +20,7 @@ export default function BookList() {
 
   useEffect(() => {
     let cancelled = false
+
     getBooksPage({ page, limit: PAGE_SIZE })
       .then((data) => {
         if (cancelled) return
@@ -35,12 +35,12 @@ export default function BookList() {
         setError(err.message)
         setLoadedPage(page)
       })
+
     return () => {
       cancelled = true
     }
   }, [page])
 
-  // 삭제 등으로 현재 페이지가 비어 버리면 마지막 페이지로 이동
   useEffect(() => {
     if (!loading && !error && total > 0 && page > totalPages) {
       setSearchParams({ page: String(totalPages) }, { replace: true })
@@ -52,8 +52,14 @@ export default function BookList() {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
+  // 현재 페이지의 책을 네 권씩 두 선반에 배치
+  const shelves = Array.from(
+    { length: 2 },
+    (_, index) => books.slice(index * 4, index * 4 + 4)
+  )
+
   return (
-    <section className='book-list-section'>
+    <section className="book-list-section">
       <div className="page-title">
         <h2>나의 책장</h2>
         <Link to="/books/new" className="btn">신규 등록</Link>
@@ -61,6 +67,7 @@ export default function BookList() {
 
       {loading && <p>불러오는 중…</p>}
       {!loading && error && <p className="error">{error}</p>}
+
       {!loading && !error && total === 0 && (
         <div className="empty">
           <p>아직 등록된 도서가 없어요</p>
@@ -71,11 +78,19 @@ export default function BookList() {
       {!loading && !error && books.length > 0 && (
         <>
           <div className="book-grid">
-            {books.map((book) => (
-              <BookCard key={book.id} book={book} />
+            {shelves.map((shelfBooks, shelfIndex) => (
+              <div className="book-shelf" key={shelfIndex}>
+                {shelfBooks.map((book) => (
+                  <BookCard key={book.id} book={book} />
+                ))}
+              </div>
             ))}
           </div>
-          <Pagination page={page} totalPages={totalPages} onChange={handlePageChange} />
+          <Pagination
+            page={page}
+            totalPages={totalPages}
+            onChange={handlePageChange}
+          />
         </>
       )}
     </section>
