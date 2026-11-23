@@ -248,8 +248,6 @@ kt-aivle-mp4-team6/
     ├── index.css          # 공통 스타일 (레이아웃 · 카드 · 폼)
     ├── api/
     │   └── books.js       # API_BASE 상수, 공통 request + GET / POST / PATCH / DELETE 함수
-    ├── data/
-    │   └── mockBooks.js   # 1일차 Mock 데이터 (현재 미사용)
     ├── components/
     │   ├── Header.jsx     # 로고 + 네비게이션
     │   └── BookCard.jsx   # 목록 카드
