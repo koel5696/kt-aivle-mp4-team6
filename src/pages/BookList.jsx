@@ -1,11 +1,10 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { Link, useSearchParams } from 'react-router-dom'
-import { getBooksPage } from '../api/books.js'
+import { getBooks } from '../api/books.js'
 import BookCard from '../components/BookCard.jsx'
 import Pagination from '../components/Pagination.jsx'
 import '../styles/BookList.css'
 
-// 데스크톱 4열 / 태블릿 3열 / 모바일 2열
 function getColumns() {
   if (typeof window === 'undefined') return 4
   if (window.matchMedia('(max-width: 599px)').matches) return 2
@@ -23,24 +22,25 @@ function useColumns() {
     ]
     const update = () => setColumns(getColumns())
 
-    queries.forEach((q) => q.addEventListener('change', update))
+    queries.forEach((query) => query.addEventListener('change', update))
     update()
-    return () => queries.forEach((q) => q.removeEventListener('change', update))
+
+    return () => {
+      queries.forEach((query) => query.removeEventListener('change', update))
+    }
   }, [])
 
   return columns
 }
 
-// 4열 → 8권(2줄), 3열 → 6권(2줄), 2열 → 6권(3줄)
 function getPageSize(columns) {
   return columns === 4 ? 8 : 6
 }
 
-// 책 배열을 columns 권씩 잘라 선반 배열로 만든다 (빈 선반은 생기지 않음)
 function chunk(items, size) {
   const result = []
-  for (let i = 0; i < items.length; i += size) {
-    result.push(items.slice(i, i + size))
+  for (let index = 0; index < items.length; index += size) {
+    result.push(items.slice(index, index + size))
   }
   return result
 }
@@ -53,50 +53,87 @@ export default function BookList() {
   const pageSize = getPageSize(columns)
 
   const [books, setBooks] = useState([])
-  const [total, setTotal] = useState(0)
+  const [query, setQuery] = useState('')
+  const [selectedCoverFilter, setSelectedCoverFilter] = useState('all')
+  const [appliedQuery, setAppliedQuery] = useState('')
+  const [appliedCoverFilter, setAppliedCoverFilter] = useState('all')
+  const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
-
-  const requestKey = `${page}:${pageSize}`
-  const [loadedKey, setLoadedKey] = useState(null)
-  const loading = loadedKey !== requestKey
-  const totalPages = Math.ceil(total / pageSize)
 
   useEffect(() => {
     let cancelled = false
 
-    getBooksPage({ page, limit: pageSize })
+    getBooks()
       .then((data) => {
         if (cancelled) return
-        setBooks(data.books)
-        setTotal(data.total)
+        setBooks(Array.isArray(data) ? data : [])
         setError(null)
-        setLoadedKey(requestKey)
       })
       .catch((err) => {
-        if (cancelled) return
-        setBooks([])
-        setError(err.message)
-        setLoadedKey(requestKey)
+        if (!cancelled) setError(err.message)
+      })
+      .finally(() => {
+        if (!cancelled) setLoading(false)
       })
 
     return () => {
       cancelled = true
     }
-  }, [page, pageSize, requestKey])
+  }, [])
 
-  // 범위를 넘어선 페이지면 마지막 페이지로 이동
+  const filteredBooks = useMemo(() => {
+    const keyword = appliedQuery.trim().toLocaleLowerCase()
+
+    return books
+      .filter((book) => {
+        const title = String(book.title ?? '').toLocaleLowerCase()
+        const author = String(book.author ?? '').toLocaleLowerCase()
+        const matchesSearch =
+          !keyword || title.includes(keyword) || author.includes(keyword)
+
+        const hasCover = Boolean(book.coverImageUrl)
+        const matchesCover =
+          appliedCoverFilter === 'all' ||
+          (appliedCoverFilter === 'with-cover' && hasCover) ||
+          (appliedCoverFilter === 'without-cover' && !hasCover)
+
+        return matchesSearch && matchesCover
+      })
+      .sort((a, b) => Number(b.id) - Number(a.id))
+  }, [books, appliedQuery, appliedCoverFilter])
+
+  const totalPages = Math.ceil(filteredBooks.length / pageSize)
+  const currentPage = Math.min(page, Math.max(1, totalPages))
+  const visibleBooks = filteredBooks.slice(
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
+  )
+
   useEffect(() => {
-    if (!loading && !error && total > 0 && page > totalPages) {
-      setSearchParams({ page: String(totalPages) }, { replace: true })
+    if (!loading && !error && page !== currentPage) {
+      setSearchParams(
+        currentPage === 1 ? {} : { page: String(currentPage) },
+        { replace: true }
+      )
     }
-  }, [loading, error, total, page, totalPages, setSearchParams])
+  }, [loading, error, page, currentPage, setSearchParams])
+
+  function handleSearch(event) {
+    event.preventDefault()
+    const value = event.currentTarget.elements.namedItem('book-query').value
+
+    setQuery(value)
+    setAppliedQuery(value.trim())
+    setAppliedCoverFilter(selectedCoverFilter)
+    setSearchParams({}, { replace: true })
+  }
 
   function handlePageChange(next) {
     setSearchParams(next === 1 ? {} : { page: String(next) })
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  const shelves = chunk(books, columns)
+  const shelves = chunk(visibleBooks, columns)
 
   return (
     <section className="book-list-section">
@@ -104,17 +141,65 @@ export default function BookList() {
         <div className="page-title-text">
           <span className="page-title-eyebrow">WALKING LIBRARY</span>
           <h2>나의 책장</h2>
-          {!loading && !error && total > 0 && (
-            <p className="page-title-count">지금 {total}권이 진열되어 있어요</p>
+          {!loading && !error && books.length > 0 && (
+            <p className="page-title-count">
+              {appliedQuery || appliedCoverFilter !== 'all'
+                ? `검색 결과 ${filteredBooks.length}권 · 전체 ${books.length}권`
+                : `지금 ${books.length}권이 진열되어 있어요`}
+            </p>
           )}
         </div>
         <Link to="/books/new" className="btn">신규 등록</Link>
       </div>
 
+      {!loading && !error && books.length > 0 && (
+        <form className="book-list-filters" onSubmit={handleSearch}>
+          <label className="book-list-search">
+            <span>도서 검색</span>
+            <input
+              name="book-query"
+              type="search"
+              value={query}
+              onChange={(event) => setQuery(event.target.value)}
+              placeholder="제목 또는 작가 검색"
+            />
+          </label>
+
+          <label className="book-list-cover-filter">
+            <span>표지</span>
+            <select
+              value={selectedCoverFilter}
+              onChange={(event) => setSelectedCoverFilter(event.target.value)}
+            >
+              <option value="all">전체</option>
+              <option value="with-cover">표지 있음</option>
+              <option value="without-cover">표지 없음</option>
+            </select>
+          </label>
+
+          <button className="btn btn-primary book-list-search-button" type="submit">
+            <svg
+              width="18"
+              height="18"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              aria-hidden="true"
+            >
+              <circle cx="11" cy="11" r="7" />
+              <path d="m20 20-4-4" />
+            </svg>
+            <span>검색</span>
+          </button>
+        </form>
+      )}
+
       {loading && <p>불러오는 중…</p>}
       {!loading && error && <p className="error">{error}</p>}
 
-      {!loading && !error && total === 0 && (
+      {!loading && !error && books.length === 0 && (
         <div className="empty">
           <p>아직 등록된 도서가 없어요</p>
           <Link to="/books/new" className="btn">새 도서 등록</Link>
@@ -124,19 +209,34 @@ export default function BookList() {
       {!loading && !error && books.length > 0 && (
         <>
           <div className="book-grid">
-            {shelves.map((shelfBooks, shelfIndex) => (
-              <div className="book-shelf" key={shelfIndex}>
-                {shelfBooks.map((book) => (
-                  <BookCard key={book.id} book={book} />
-                ))}
-              </div>
-            ))}
+            {(shelves.length > 0 ? shelves : [[]]).map(
+              (shelfBooks, shelfIndex) => (
+                <div
+                  className={`book-shelf${
+                    filteredBooks.length === 0 ? ' book-shelf--empty' : ''
+                  }`}
+                  key={shelfIndex}
+                >
+                  {shelfBooks.map((book) => (
+                    <BookCard key={book.id} book={book} />
+                  ))}
+                  {filteredBooks.length === 0 && shelfIndex === 0 && (
+                    <p className="book-list-empty-result" role="status">
+                      검색 조건에 맞는 도서가 없어요
+                    </p>
+                  )}
+                </div>
+              )
+            )}
           </div>
-          <Pagination
-            page={page}
-            totalPages={totalPages}
-            onChange={handlePageChange}
-          />
+
+          {totalPages > 1 && (
+            <Pagination
+              page={currentPage}
+              totalPages={totalPages}
+              onChange={handlePageChange}
+            />
+          )}
         </>
       )}
     </section>
