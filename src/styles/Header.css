@@ -2,6 +2,10 @@
   background: #fff; 
   border-bottom: 1px solid var(--border); 
 }
+.header-inner.container {
+  width: 100%;
+  max-width: 1280px;
+}
 .header-inner { 
   display: flex; 
   align-items: center; 
