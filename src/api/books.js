@@ -87,3 +87,9 @@ export function updateBook(id, patch) {
 export function deleteBook(id) {
   return request(`/books/${encodeURIComponent(id)}`, { method: 'DELETE' })
 }
+
+export function addCoverImage(id, coverImageUrl){
+  return updateBook(id, {
+    coverImageUrl,
+  })
+}

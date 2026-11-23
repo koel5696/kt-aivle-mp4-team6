@@ -1,4 +1,5 @@
 import { Link } from "react-router-dom";
+import {generateBookCover} from '../api/cover.js'
 
 export default function BookForm({
   heading,
