@@ -20,7 +20,7 @@
   flex-direction: column;
 }
 html {
-  scrollbar-gutter: stable;
+  overflow-y: scroll;
 }
 
 * { 
