@@ -5,6 +5,15 @@ import useBook from '../hooks/useBook.js'
 import { useToast } from '../contexts/ToastContext.js'
 import '../styles/BookDetail.css'
 
+// 2026년 11월 23일 형태로 표시
+function formatDate(iso) {
+  return new Date(iso).toLocaleDateString('ko-KR', {
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+  })
+}
+
 export default function BookDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
@@ -115,33 +124,52 @@ export default function BookDetail() {
       }
   }
 
+  const isEdited = book.updatedAt && book.updatedAt !== book.createdAt
+
   return (
-    <div className='book-detail-section'>
-      <h2>도서 정보</h2>
+    <div className="book-detail-section">
+      <Link to="/" className="detail-back">← 목록으로</Link>
+
       <section className="detail">
         <div className="detail-img">
           {book.coverImageUrl ? (
-            <img
-              src={book.coverImageUrl}
-              alt={`${book.title} 표지`}
-            />
+            <img src={book.coverImageUrl} alt={`${book.title} 표지`} />
           ) : (
-            <span>표지 없음</span>
+            <div className="detail-img-empty">
+              <span className="detail-img-empty-title">{book.title}</span>
+              <span className="detail-img-empty-hint">아직 표지가 없어요</span>
+            </div>
           )}
         </div>
 
         <div className="detail-body">
-          <div className='detail-body-title'>
-            <h2>{book.title}</h2>
-            <h3 className="muted">{book.author}</h3>
-            <p className="muted">
-              작성 {new Date(book.createdAt).toLocaleString('ko-KR')} · 수정 {new Date(book.updatedAt).toLocaleString('ko-KR')}
+          <header className="detail-header">
+            <h2 className="detail-title">{book.title}</h2>
+            <p className="detail-author">
+              <span className="detail-label">지은이</span>
+              {book.author}
             </p>
+            <dl className="detail-meta">
+              <div>
+                <dt>등록일</dt>
+                <dd>{formatDate(book.createdAt)}</dd>
+              </div>
+              {isEdited && (
+                <div>
+                  <dt>수정일</dt>
+                  <dd>{formatDate(book.updatedAt)}</dd>
+                </div>
+              )}
+            </dl>
+          </header>
+
+          <div className="detail-section">
+            <h3 className="detail-section-title">책 소개</h3>
+            <p className="detail-content">{book.content}</p>
           </div>
-          <p className="detail-content">{book.content}</p>
 
           <div className="detail-buttons">
-            <Link to={`/books/${book.id}/edit`} className="btn btn-primary">수정</Link>
+            <Link to={`/books/${book.id}/edit`} className="btn btn-primary">수정하기</Link>
             <button className="btn btn-danger" type="button" onClick={handleDelete} disabled={deleting}>
               {deleting ? '삭제 중…' : '삭제'}
             </button>
