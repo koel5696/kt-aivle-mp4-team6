@@ -47,7 +47,12 @@ export async function generateCoverImage({ apiKey, quality, title, author, conte
       }),
     })
   } catch {
-    throw new Error('네트워크 오류로 OpenAI에 연결하지 못했어요.')
+    // 브라우저는 CORS 헤더가 없는 오류 응답(잘못된 키의 401 등)을 막아서 상태 코드를 알 수 없음
+    // → 오프라인일 때만 네트워크 문제로 보고, 온라인이면 키 문제일 가능성이 높다고 안내
+    if (!navigator.onLine) {
+      throw new Error('인터넷 연결이 끊겨 있어요. 연결을 확인한 뒤 다시 시도해 주세요.')
+    }
+    throw new Error('OpenAI 요청이 거절됐어요. API 키가 올바른지 확인해 주세요.')
   }
 
   if (!res.ok) throw new Error(await getErrorMessage(res))
