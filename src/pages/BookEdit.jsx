@@ -21,8 +21,7 @@ export default function BookEdit() {
   }
 
   if (!book) {
-    const message =
-      error === '서버에 연결할 수 없습니다' ? error : '도서를 찾을 수 없습니다'
+    const message = error ?? '도서를 찾을 수 없습니다'
     return (
       <section>
         <h2>도서 수정</h2>

@@ -40,8 +40,7 @@ export default function BookDetail() {
 
   if (loading) return <p>불러오는 중…</p>
   if (!book) {
-    const message =
-      loadError === '서버에 연결할 수 없습니다' ? loadError : '도서를 찾을 수 없습니다'
+    const message = loadError ?? '도서를 찾을 수 없습니다'
     return (
       <section>
         <p className="error">{message}</p>
