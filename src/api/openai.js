@@ -1,10 +1,12 @@
+import { ApiError, HTTP_STATUS } from '../constants/http.js'
+
 const OPENAI_IMAGE_API_URL = 'https://api.openai.com/v1/images/generations'
 
 // OpenAI 응답 상태 코드를 사용자에게 보여줄 문구로 변환
 async function getErrorMessage(res) {
-  if (res.status === 401) return 'API 키가 올바르지 않아요. 키를 다시 확인해 주세요.'
-  if (res.status === 429) return '요청 한도를 초과했어요. 잠시 후 다시 시도하거나 결제 한도를 확인해 주세요.'
-  if (res.status >= 500) return 'OpenAI 서버에 문제가 있어요. 잠시 후 다시 시도해 주세요.'
+  if (res.status === HTTP_STATUS.UNAUTHORIZED) return 'API 키가 올바르지 않아요. 키를 다시 확인해 주세요.'
+  if (res.status === HTTP_STATUS.TOO_MANY_REQUESTS) return '요청 한도를 초과했어요. 잠시 후 다시 시도하거나 결제 한도를 확인해 주세요.'
+  if (res.status >= HTTP_STATUS.INTERNAL_SERVER_ERROR) return 'OpenAI 서버에 문제가 있어요. 잠시 후 다시 시도해 주세요.'
   try {
     const data = await res.json()
     if (data.error?.message) return data.error.message
@@ -50,12 +52,12 @@ export async function generateCoverImage({ apiKey, quality, title, author, conte
     // 브라우저는 CORS 헤더가 없는 오류 응답(잘못된 키의 401 등)을 막아서 상태 코드를 알 수 없음
     // → 오프라인일 때만 네트워크 문제로 보고, 온라인이면 키 문제일 가능성이 높다고 안내
     if (!navigator.onLine) {
-      throw new Error('인터넷 연결이 끊겨 있어요. 연결을 확인한 뒤 다시 시도해 주세요.')
+      throw new ApiError('인터넷 연결이 끊겨 있어요. 연결을 확인한 뒤 다시 시도해 주세요.')
     }
-    throw new Error('OpenAI 요청이 거절됐어요. API 키가 올바른지 확인해 주세요.')
+    throw new ApiError('OpenAI 요청이 거절됐어요. API 키가 올바른지 확인해 주세요.')
   }
 
-  if (!res.ok) throw new Error(await getErrorMessage(res))
+  if (!res.ok) throw new ApiError(await getErrorMessage(res), res.status)
 
   const data = await res.json()
   const b64Json = data.data?.[0]?.b64_json
