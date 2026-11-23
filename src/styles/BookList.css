@@ -166,6 +166,10 @@ main.container:has(.book-list-section) {
 
 /* 태블릿 - 3권 */
 @media (max-width: 1023px) {
+  .book-list-section {
+    padding-top: 0px;
+  }
+
   .book-grid {
     padding: 32px 28px 28px;
     gap: 40px;
