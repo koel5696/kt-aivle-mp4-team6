@@ -69,7 +69,6 @@ export default function BookDetail() {
             <button className="btn btn-danger" type="button" onClick={handleDelete} disabled={deleting}>
               삭제
             </button>
-            {/* <button className="btn btn-primary" type="button" disabled>AI 표지 생성</button> */}
           </div>
         </div>
       </section>
