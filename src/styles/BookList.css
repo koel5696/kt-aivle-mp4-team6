@@ -256,11 +256,15 @@ main.container:has(.book-list-section) {
   font: inherit;
   font-weight: 400;
 }
+.book-list-filters input:hover,
+.book-list-filters select:hover {
+  border-color: #c9b693;
+}
 
-.book-list-filters input:focus-visible,
-.book-list-filters select:focus-visible {
-  outline: 2px solid var(--primary);
-  outline-offset: 2px;
+.book-list-filters input:focus,
+.book-list-filters select:focus {
+  outline: none;
+  border-color: #8a6d3b;
 }
 
 .book-list-search-button {
@@ -269,6 +273,17 @@ main.container:has(.book-list-section) {
   align-items: center;
   justify-content: center;
   gap: 8px;
+}
+
+.book-list-search-button.btn-primary {
+  background: #8a6d3b;
+  border-color: #8a6d3b;
+  color: #fff;
+}
+
+.book-list-search-button.btn-primary:hover:not(:disabled) {
+  background: #7a5634;
+  border-color: #7a5634;
 }
 
 .book-shelf--empty {
