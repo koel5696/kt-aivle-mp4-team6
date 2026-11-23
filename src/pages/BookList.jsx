@@ -5,11 +5,52 @@ import BookCard from '../components/BookCard.jsx'
 import Pagination from '../components/Pagination.jsx'
 import '../styles/BookList.css'
 
-const PAGE_SIZE = 8
+function getColumns() {
+  if (typeof window === 'undefined') return 4
+  if (window.matchMedia('(max-width: 599px)').matches) return 2
+  if (window.matchMedia('(max-width: 1023px)').matches) return 3
+  return 4
+}
+
+function useColumns() {
+  const [columns, setColumns] = useState(getColumns)
+
+  useEffect(() => {
+    const queries = [
+      window.matchMedia('(max-width: 599px)'),
+      window.matchMedia('(max-width: 1023px)'),
+    ]
+    const update = () => setColumns(getColumns())
+
+    queries.forEach((query) => query.addEventListener('change', update))
+    update()
+
+    return () => {
+      queries.forEach((query) => query.removeEventListener('change', update))
+    }
+  }, [])
+
+  return columns
+}
+
+function getPageSize(columns) {
+  return columns === 4 ? 8 : 6
+}
+
+function chunk(items, size) {
+  const result = []
+  for (let index = 0; index < items.length; index += size) {
+    result.push(items.slice(index, index + size))
+  }
+  return result
+}
 
 export default function BookList() {
   const [searchParams, setSearchParams] = useSearchParams()
   const page = Math.max(1, Number.parseInt(searchParams.get('page'), 10) || 1)
+
+  const columns = useColumns()
+  const pageSize = getPageSize(columns)
 
   const [books, setBooks] = useState([])
   const [query, setQuery] = useState('')
@@ -61,25 +102,26 @@ export default function BookList() {
       .sort((a, b) => Number(b.id) - Number(a.id))
   }, [books, appliedQuery, appliedCoverFilter])
 
-  const totalPages = Math.ceil(filteredBooks.length / PAGE_SIZE)
+  const totalPages = Math.ceil(filteredBooks.length / pageSize)
   const currentPage = Math.min(page, Math.max(1, totalPages))
   const visibleBooks = filteredBooks.slice(
-    (currentPage - 1) * PAGE_SIZE,
-    currentPage * PAGE_SIZE
+    (currentPage - 1) * pageSize,
+    currentPage * pageSize
   )
 
   useEffect(() => {
-    if (!loading && page !== currentPage) {
+    if (!loading && !error && page !== currentPage) {
       setSearchParams(
         currentPage === 1 ? {} : { page: String(currentPage) },
         { replace: true }
       )
     }
-  }, [loading, page, currentPage, setSearchParams])
+  }, [loading, error, page, currentPage, setSearchParams])
 
   function handleSearch(event) {
     event.preventDefault()
     const value = event.currentTarget.elements.namedItem('book-query').value
+
     setQuery(value)
     setAppliedQuery(value.trim())
     setAppliedCoverFilter(selectedCoverFilter)
@@ -91,10 +133,7 @@ export default function BookList() {
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
-  const shelves = Array.from(
-    { length: 2 },
-    (_, index) => visibleBooks.slice(index * 4, index * 4 + 4)
-  )
+  const shelves = chunk(visibleBooks, columns)
 
   return (
     <section className="book-list-section">
@@ -138,17 +177,7 @@ export default function BookList() {
             </select>
           </label>
 
-          <button
-            className="btn btn-primary"
-            type="submit"
-            style={{
-              height: 42,
-              display: 'inline-flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              gap: 8,
-            }}
-          >
+          <button className="btn btn-primary book-list-search-button" type="submit">
             <svg
               width="18"
               height="18"
@@ -180,32 +209,25 @@ export default function BookList() {
       {!loading && !error && books.length > 0 && (
         <>
           <div className="book-grid">
-            {shelves.map((shelfBooks, shelfIndex) => (
-              <div
-                className="book-shelf"
-                key={shelfIndex}
-                style={{ minHeight: 330 }}
-              >
-                {shelfBooks.map((book) => (
-                  <BookCard key={book.id} book={book} />
-                ))}
-                {filteredBooks.length === 0 && shelfIndex === 0 && (
-                  <p
-                    role="status"
-                    style={{
-                      alignSelf: 'center',
-                      position: 'relative',
-                      zIndex: 2,
-                      padding: '16px 24px',
-                      borderRadius: 8,
-                      background: '#fffdf8',
-                    }}
-                  >
-                    검색 조건에 맞는 도서가 없어요
-                  </p>
-                )}
-              </div>
-            ))}
+            {(shelves.length > 0 ? shelves : [[]]).map(
+              (shelfBooks, shelfIndex) => (
+                <div
+                  className={`book-shelf${
+                    filteredBooks.length === 0 ? ' book-shelf--empty' : ''
+                  }`}
+                  key={shelfIndex}
+                >
+                  {shelfBooks.map((book) => (
+                    <BookCard key={book.id} book={book} />
+                  ))}
+                  {filteredBooks.length === 0 && shelfIndex === 0 && (
+                    <p className="book-list-empty-result" role="status">
+                      검색 조건에 맞는 도서가 없어요
+                    </p>
+                  )}
+                </div>
+              )
+            )}
           </div>
 
           {totalPages > 1 && (
