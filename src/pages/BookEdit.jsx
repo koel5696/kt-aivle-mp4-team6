@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from 'react-router-dom'
 import { updateBook } from '../api/books.js'
 import useBook from '../hooks/useBook.js'
 import BookForm from '../components/BookForm.jsx'
+import { useToast } from '../contexts/ToastContext.js'
 import '../styles/BookForm.css'
 
 export default function BookEdit() {
@@ -38,6 +39,7 @@ export default function BookEdit() {
 
 function BookEditForm({ book }) {
   const navigate = useNavigate()
+  const toast = useToast()
   const [title, setTitle] = useState(book.title)
   const [author, setAuthor] = useState(book.author)
   const [content, setContent] = useState(book.content)
@@ -64,6 +66,7 @@ function BookEditForm({ book }) {
     if (next.content !== book.content) patch.content = next.content
     if (next.coverImageUrl !== (book.coverImageUrl || '')) {patch.coverImageUrl = next.coverImageUrl}
     if (Object.keys(patch).length === 0) {
+      toast.info('변경된 내용이 없어요')
       navigate(`/books/${book.id}`)
       return
     }
@@ -72,9 +75,10 @@ function BookEditForm({ book }) {
     setError(null)
     try {
       await updateBook(book.id, patch)
+      toast.success('수정 내용을 저장했어요')
       navigate(`/books/${book.id}`)
     } catch (err) {
-      setError(err.message)
+      toast.error(`수정 내용 저장에 실패했어요 (${err.message})`)
       setSubmitting(false)
     }
   }

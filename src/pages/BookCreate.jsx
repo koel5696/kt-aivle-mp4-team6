@@ -2,10 +2,12 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { createBook } from '../api/books.js'
 import BookForm from '../components/BookForm.jsx'
+import { useToast } from '../contexts/ToastContext.js'
 import '../styles/BookForm.css'
 
 export default function BookCreate() {
   const navigate = useNavigate()
+  const toast = useToast()
   const [title, setTitle] = useState('')
   const [author, setAuthor] = useState('')
   const [content, setContent] = useState('')
@@ -30,9 +32,10 @@ export default function BookCreate() {
     setError(null)
     try {
       await createBook(next)
+      toast.success(`「${next.title}」을(를) 등록했어요`)
       navigate('/')
     } catch (err) {
-      setError(err.message)
+      toast.error(`도서 등록에 실패했어요 (${err.message})`)
       setSubmitting(false)
     }
   }

@@ -5,11 +5,13 @@ import BookDetail from './pages/BookDetail.jsx'
 import BookCreate from './pages/BookCreate.jsx'
 import BookEdit from './pages/BookEdit.jsx'
 import Footer from './components/Footer.jsx'
+import ToastProvider from './components/ToastProvider.jsx'
+import NotFound from './pages/NotFound.jsx'
 
 // 라우터 설정 — 화면 구성은 README "화면 구성" 참고
 export default function App() {
   return (
-    <>
+    <ToastProvider>
       <Header />
       <main className="container">
         <Routes>
@@ -17,10 +19,10 @@ export default function App() {
           <Route path="/books/new" element={<BookCreate />} />
           <Route path="/books/:id" element={<BookDetail />} />
           <Route path="/books/:id/edit" element={<BookEdit />} />
-          <Route path="*" element={<p>페이지를 찾을 수 없습니다.</p>} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
       <Footer />
-    </>
+    </ToastProvider>
   )
 }

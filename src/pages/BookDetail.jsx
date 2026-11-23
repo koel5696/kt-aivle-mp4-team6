@@ -2,24 +2,29 @@ import { useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { deleteBook } from '../api/books.js'
 import useBook from '../hooks/useBook.js'
+import { useToast } from '../contexts/ToastContext.js'
 import '../styles/BookDetail.css'
 
 export default function BookDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
+  const toast = useToast()
   const { book, loading, error: loadError } = useBook(id)
-  const [error, setError] = useState(null) // 삭제 실패 메시지
   const [deleting, setDeleting] = useState(false)
-
+  
+  const [apiKey, setApiKey] = useState('')
+  const [isGenerating, setIsGenerating] = useState(false)
+  const [quality, setQuality] = useState('low')
+  
   async function handleDelete() {
-    if (!book || !window.confirm('이 도서를 삭제할까요?')) return
+    if (!book || !window.confirm(`「${book.title}」을(를) 삭제할까요?`)) return
     setDeleting(true)
-    setError(null)
     try {
       await deleteBook(book.id)
+      toast.success(`「${book.title}」을(를) 삭제했어요`)
       navigate('/')
     } catch (err) {
-      setError(err.message)
+      toast.error(`도서 삭제에 실패했어요 (${err.message})`)
       setDeleting(false)
     }
   }
@@ -36,6 +41,78 @@ export default function BookDetail() {
         </div>
       </section>
     )
+  }
+
+  const OPENAI_IMAGE_API_URL = "https://api.openai.com/v1/images/generations" 
+  const API_BASE = 'http://localhost:3000/books/'
+
+  async function handleGenerateCover(){
+      
+      const prompt = `
+      #역할
+      전문 책 표지 생성 AI
+      #지침
+      - 주어진 책 이름, 작가, 내용을 바탕으로 가장 적합한 책 표지 만들어
+      - 책 이름, 작가 이름이 표지에 나오도록
+      - 
+      제목: ${book.title}
+      작가: ${book.author}
+      내용: ${book.content}
+      
+      `
+      if(!apiKey.trim()) return;
+
+      setApiKey(apiKey.trim());
+      setIsGenerating(true);
+
+      const res = await fetch(OPENAI_IMAGE_API_URL, {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+              Authorization:`Bearer ${apiKey}`
+          },
+
+          body:JSON.stringify({
+              model: 'gpt-image-2',
+              prompt,
+              n:1,
+              size:'1024x1536',
+              quality: `${quality}`,
+              output_format:'png'
+          })
+      });
+
+      if(!res.ok){ 
+        setIsGenerating(false);
+        throw new Error('OpenAI 표지 생성 불가...');
+      }
+      console.log(res);
+      const data = await res.json();
+      const b64Json = data.data?.[0]?.b64_json;
+
+      if(!b64Json){
+        setIsGenerating(false);
+        throw new Error('이미지 ');
+      }
+
+      const imageSrc = `data:image/png;base64,${b64Json}`;
+      try{
+          await fetch(`${API_BASE}${book.id}`, {
+              method: 'PATCH',
+              headers: {
+                  'Content-Type': 'application/json',
+              },
+              body: JSON.stringify({
+                  coverImageUrl: imageSrc,
+                  updatedAt: new Date().toISOString()
+              }),
+          });
+      }catch(e){
+          console.log(e.message);
+      }finally{
+        setIsGenerating(false);
+        setApiKey('');
+      }
   }
 
   return (
@@ -62,14 +139,51 @@ export default function BookDetail() {
             </p>
           </div>
           <p className="detail-content">{book.content}</p>
-          {error && <p className="error">{error}</p>}
 
           <div className="detail-buttons">
             <Link to={`/books/${book.id}/edit`} className="btn btn-primary">수정</Link>
             <button className="btn btn-danger" type="button" onClick={handleDelete} disabled={deleting}>
-              삭제
+              {deleting ? '삭제 중…' : '삭제'}
             </button>
           </div>
+
+          <div className="book-form-img-section">
+              <input type="password" placeholder="API키를 입력하세요."  value={apiKey} onChange={event=> setApiKey(event.target.value)}/>
+              <label htmlFor="quality">표지 화질:</label>
+              <select id="qualitySelector" name="quality" onChange={event => setQuality(event.target.value)}>
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+                <option value="auto">Auto</option>
+              </select>
+              {console.log(quality)}
+              <div className="book-form-img-button">
+                  <button className="btn btn-primary" type="submit"  onClick={handleGenerateCover} disabled={isGenerating}>
+                    {isGenerating ? "생성 중 ...": "AI 표지 생성"} </button>
+                  <button className="btn btn-danger" type="submit"  onClick={handleGenerateCover} disabled={isGenerating}>
+                    {isGenerating ? "생성 중 ...": "AI 표지 재생성"} </button>
+              </div>
+          </div>
+
+
+          {/* <div className="genCover">
+            <div className = "apiDiv">
+              <label htmlFor="quality">API KEY:</label>
+              <input placeholder="OPENAI API KEY" type="password" value={apiKey} onChange={event=> setApiKey(event.target.value)}/>
+              <label htmlFor="quality">표지 화질:</label>
+              <select id="qualitySelector" name="quality" onChange={event => setQuality(event.target.value)}>
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
+                <option value="auto">Auto</option>
+              </select>
+              
+            </div>
+            <div className="book-form-img-button">
+              <button className="btn btn-primary" type="button" onClick={handleGenerateCover} disabled= {isGenerating}>
+                {isGenerating? "생성 중 ...": "AI 표지 생성"}</button>
+            </div>
+          </div> */}
         </div>
       </section>
     </div>
