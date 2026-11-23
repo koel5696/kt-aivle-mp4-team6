@@ -1,9 +1,9 @@
 /* 진열대에 세워 둔 책 한 권 */
 .book-card {
-  --cover-w: 174px;
-  --cover-h: 261px;
+  --card-w: var(--cover-w, 174px);
+  --card-h: calc(var(--card-w) * 1.5);
 
-  width: var(--cover-w);
+  width: var(--card-w);
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -18,8 +18,8 @@
 /* ───── 표지 ───── */
 .book-card-cover {
   position: relative;
-  width: var(--cover-w);
-  height: var(--cover-h);
+  width: var(--card-w);
+  height: var(--card-h);
   border-radius: 2px 5px 5px 2px;
   background: #ded8cb;
   overflow: hidden;
@@ -127,7 +127,6 @@
 /* ───── 선반 아래 이름표 ───── */
 .book-card-tag {
   width: 100%;
-  margin-top: 30px; /* 선반 두께만큼 띄움 */
   padding: 8px 10px 9px;
 
   display: flex;
