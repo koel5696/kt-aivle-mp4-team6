@@ -61,7 +61,13 @@ export default function BookList() {
   return (
     <section className="book-list-section">
       <div className="page-title">
-        <h2>나의 책장</h2>
+        <div className="page-title-text">
+          <span className="page-title-eyebrow">WALKING LIBRARY</span>
+          <h2>나의 책장</h2>
+          {!loading && !error && total > 0 && (
+            <p className="page-title-count">지금 {total}권이 진열되어 있어요</p>
+          )}
+        </div>
         <Link to="/books/new" className="btn">신규 등록</Link>
       </div>
 
