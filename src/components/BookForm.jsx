@@ -1,5 +1,12 @@
 import { Link } from "react-router-dom";
 
+// 입력 최대 글자 수 (유효성 검사: 길이 제한)
+const MAX_LENGTH = {
+  title: 50,
+  author: 20,
+  content: 1000,
+};
+
 export default function BookForm({
   heading,
   title,
@@ -34,17 +41,41 @@ export default function BookForm({
                 <form className="form" onSubmit={onSubmit}>
                     <label>
                         책 제목
-                        <input value={title} onChange={(event) => setTitle(event.target.value)} placeholder="책의 제목을 작성해주세요."/>
+                        <input
+                            value={title}
+                            onChange={(event) => setTitle(event.target.value)}
+                            placeholder="책의 제목을 작성해주세요."
+                            maxLength={MAX_LENGTH.title}
+                        />
+                        <span className={`char-count ${title.length >= MAX_LENGTH.title ? "char-count-max" : ""}`}>
+                            {title.length} / {MAX_LENGTH.title}
+                        </span>
                     </label>
 
                     <label>
                         저자
-                        <input value={author} onChange={(event) => setAuthor(event.target.value)} placeholder="책의 저자를 작성해주세요."/>
+                        <input
+                            value={author}
+                            onChange={(event) => setAuthor(event.target.value)}
+                            placeholder="책의 저자를 작성해주세요."
+                            maxLength={MAX_LENGTH.author}
+                        />
+                        <span className={`char-count ${author.length >= MAX_LENGTH.author ? "char-count-max" : ""}`}>
+                            {author.length} / {MAX_LENGTH.author}
+                        </span>
                     </label>
 
                     <label>
                         내용
-                        <textarea value={content} onChange={(event) => setContent(event.target.value)} placeholder="책의 내용을 작성해주세요."/>
+                        <textarea
+                            value={content}
+                            onChange={(event) => setContent(event.target.value)}
+                            placeholder="책의 내용을 작성해주세요."
+                            maxLength={MAX_LENGTH.content}
+                        />
+                        <span className={`char-count ${content.length >= MAX_LENGTH.content ? "char-count-max" : ""}`}>
+                            {content.length} / {MAX_LENGTH.content}
+                        </span>
                     </label>
 
                     {error && <p className="error">{error}</p>}
