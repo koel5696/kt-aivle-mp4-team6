@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { createBook } from '../api/books.js'
+import { isUnsavedCover, uploadCover } from '../api/images.js'
 import BookForm from '../components/BookForm.jsx'
 import { useToast } from '../contexts/ToastContext.js'
 import '../styles/BookForm.css'
@@ -33,6 +34,10 @@ export default function BookCreate() {
     setSubmitting(true)
     setError(null)
     try {
+      // 생성한 표지는 저장할 때 이미지 서버에 올림 (저장하지 않고 나가면 버려짐)
+      if (isUnsavedCover(next.coverImageUrl)) {
+        next.coverImageUrl = await uploadCover(next.coverImageUrl)
+      }
       await createBook(next)
       toast.success(`「${next.title}」을(를) 등록했어요`)
       navigate('/')

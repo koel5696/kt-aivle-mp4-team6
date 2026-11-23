@@ -1,6 +1,15 @@
+import { ApiError, HTTP_STATUS } from '../constants/http.js'
+
 export const API_BASE = import.meta.env.VITE_API_BASE || 'http://localhost:3000'
 
 // 응답 본문(payload)과 헤더를 함께 반환 — 페이지 조회에서 X-Total-Count를 읽기 위함
+// 상태 코드를 사용자에게 보여줄 문구로 변환
+function getErrorMessage(status) {
+  if (status === HTTP_STATUS.NOT_FOUND) return '해당 도서를 찾을 수 없어요'
+  if (status >= HTTP_STATUS.INTERNAL_SERVER_ERROR) return '서버에 문제가 생겼어요. 잠시 후 다시 시도해 주세요'
+  return `요청을 처리하지 못했어요 (${status})`
+}
+
 async function send(path, { method = 'GET', body } = {}) {
   let res
   try {
@@ -10,10 +19,16 @@ async function send(path, { method = 'GET', body } = {}) {
       body: body !== undefined ? JSON.stringify(body) : undefined,
     })
   } catch {
-    throw new Error('서버에 연결할 수 없습니다')
+    throw new ApiError('서버에 연결할 수 없습니다')
   }
 
-  const text = await res.text()
+  // 응답 본문을 받는 도중 연결이 끊겨도 연결 실패로 안내
+  let text
+  try {
+    text = await res.text()
+  } catch {
+    throw new ApiError('서버 응답을 끝까지 받지 못했어요. 다시 시도해 주세요')
+  }
   let payload = null
   if (text) {
     try {
@@ -24,11 +39,7 @@ async function send(path, { method = 'GET', body } = {}) {
   }
 
   if (!res.ok) {
-    const message =
-      payload && typeof payload === 'object' && payload.message
-        ? payload.message
-        : res.statusText || 'Request failed'
-    throw new Error(`${res.status} ${message}`.trim())
+    throw new ApiError(getErrorMessage(res.status), res.status)
   }
 
   return { payload, headers: res.headers }

@@ -54,3 +54,65 @@
   outline-offset: 4px;
   border-radius: 2px;
 }
+
+@media (max-width: 599px) {
+  .logo {
+    font-size: 18px;
+  }
+  .logo-img {
+    width: 32px;
+    height: 32px;
+  }
+}
+/* 책 펼침 효과 켜기/끄기 스위치 */
+.nav {
+  align-items: center;
+}
+.effect-toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px 0;
+  border: 0;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+}
+.effect-toggle-track {
+  position: relative;
+  width: 30px;
+  height: 17px;
+  border-radius: 999px;
+  background: #d9d2c7;
+  transition: background 160ms ease;
+}
+.effect-toggle-thumb {
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
+  transition: transform 160ms ease;
+}
+.effect-toggle[aria-checked="true"] .effect-toggle-track {
+  background: #8a6d3b;
+}
+.effect-toggle[aria-checked="true"] .effect-toggle-thumb {
+  transform: translateX(13px);
+}
+.effect-toggle:focus-visible {
+  outline: 2px solid #8a7868;
+  outline-offset: 4px;
+  border-radius: 4px;
+}
+
+@media (max-width: 599px) {
+  .effect-toggle-label {
+    display: none; /* 좁은 화면에서는 스위치만 */
+  }
+}
