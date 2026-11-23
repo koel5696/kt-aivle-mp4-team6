@@ -62,7 +62,7 @@ export function getBook(id) {
   return request(`/books/${encodeURIComponent(id)}`)
 }
 
-export function createBook({ title, author, content }) {
+export function createBook({ title, author, content, coverImageUrl }) {
   const now = new Date().toISOString()
   return request('/books', {
     method: 'POST',
@@ -70,7 +70,7 @@ export function createBook({ title, author, content }) {
       title,
       author,
       content,
-      coverImageUrl: '',
+      coverImageUrl,
       createdAt: now,
       updatedAt: now,
     },
