@@ -4,6 +4,7 @@ import { deleteBook, updateBook } from '../api/books.js'
 import useBook from '../hooks/useBook.js'
 import { useToast } from '../contexts/ToastContext.js'
 import '../styles/BookDetail.css'
+import NotFound from './NotFound.jsx'
 
 const OPENAI_IMAGE_API_URL = 'https://api.openai.com/v1/images/generations'
 
@@ -58,16 +59,10 @@ export default function BookDetail() {
 
   if (loading) return <p>불러오는 중…</p>
   if (!book) {
-    const message =
-      loadError === '서버에 연결할 수 없습니다' ? loadError : '도서를 찾을 수 없습니다'
-    return (
-      <section>
-        <p className="error">{message}</p>
-        <div className="actions">
-          <Link to="/" className="btn">목록으로</Link>
-        </div>
-      </section>
-    )
+    if (loadError === '서버에 연결할 수 없습니다') {
+      return <NotFound title="서버에 연결할 수 없어요" desc="잠시 후 다시 시도해주세요." />
+    }
+    return <NotFound title="도서를 찾을 수 없어요" desc="삭제되었거나 존재하지 않는 도서예요." />
   }
 
   const coverImageUrl = newCover ?? book.coverImageUrl
