@@ -44,6 +44,7 @@ main.container:has(.book-list-section) {
   display: flex;
   flex-direction: column;
   gap: 44px;
+  container-type: inline-size;
 
   background:
     radial-gradient(
@@ -57,30 +58,34 @@ main.container:has(.book-list-section) {
   box-shadow:
     inset 0 0 0 6px #f7f0e4,
     inset 0 12px 30px rgba(120, 90, 50, 0.08);
-
-  overflow-x: auto;
 }
 
 /* 선반 한 칸 */
 .book-shelf {
-  --cover-h: 261px;
+  --cols: 4;
+  --shelf-pad: 24px;
+  --shelf-gap: 40px;
   --ledge-h: 22px;
+  --cover-w: min(
+    171px,
+    calc((100cqw - var(--shelf-pad) * 2 - var(--shelf-gap) * (var(--cols) - 1)) / var(--cols))
+  );
+  --cover-h: calc(var(--cover-w) * 1.526);
 
   position: relative;
-  min-width: 852px;
-  padding: 0 24px;
+  padding: 0 var(--shelf-pad) calc(var(--ledge-h) - 2px);
 
   display: flex;
   justify-content: center;
   align-items: flex-start;
-  gap: 40px;
+  gap: var(--shelf-gap);
 }
 
 /* 표지 아래에 걸친 나무 선반 */
 .book-shelf::after {
   content: "";
   position: absolute;
-  top: calc(var(--cover-h) - 2px);
+  bottom: 0;
   left: 0;
   right: 0;
   height: var(--ledge-h);
@@ -157,4 +162,58 @@ main.container:has(.book-list-section) {
   width: 12px;
   height: 12px;
   opacity: 1;
+}
+
+/* 태블릿 - 3권 */
+@media (max-width: 1023px) {
+  .book-list-section {
+    padding-top: 0px;
+  }
+
+  .book-grid {
+    padding: 32px 28px 28px;
+    gap: 40px;
+  }
+
+  .book-shelf {
+    --cols: 3;
+    --shelf-pad: 16px;
+    --shelf-gap: 28px;
+  }
+}
+
+/* 모바일 - 2권 */
+@media (max-width: 599px) {
+  main.container:has(.book-list-section) {
+    padding-left: 16px;
+    padding-right: 16px;
+  }
+
+  .page-title-text h2 {
+    font-size: 20px;
+  }
+
+  .book-grid {
+    padding: 24px 12px 20px;
+    gap: 28px;
+    box-shadow:
+      inset 0 0 0 4px #f7f0e4,
+      inset 0 12px 30px rgba(120, 90, 50, 0.08);
+  }
+
+  .book-shelf {
+    --cols: 2;
+    --shelf-pad: 12px;
+    --shelf-gap: 12px;
+    --ledge-h: 14px;
+    --cover-w: min(
+      140px,
+      calc((100cqw - var(--shelf-pad) * 2 - var(--shelf-gap)) / 2)
+    );
+  }
+
+  .page-title {
+    flex-wrap: wrap;
+    align-items: flex-end;
+  }
 }
