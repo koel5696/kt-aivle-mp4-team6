@@ -1,5 +1,4 @@
-/* [추가 구현] 목록 화면의 헤더와 본문 좌우 기준선 통일 */
-#root:has(.book-list-section) .header-inner.container,
+/* 목록 본문을 책장 너비에 맞춤 */
 main.container:has(.book-list-section) {
   width: 100%;
   max-width: 1280px;
@@ -17,7 +16,6 @@ main.container:has(.book-list-section) {
   justify-content: space-between;
 }
 
-/* [추가 구현] 넓어진 목록 영역을 채우는 책장 */
 .book-grid {
   width: 100%;
   margin: 24px auto 0;
@@ -34,11 +32,10 @@ main.container:has(.book-list-section) {
   overflow-x: auto;
 }
 
-/* [추가 구현] 한 줄에 최대 네 권이 놓이는 선반 */
 .book-shelf {
   position: relative;
   min-width: 852px;
-  min-height: 280px;
+  min-height: 340px;
   padding: 0 12px 8px;
 
   display: flex;
@@ -47,7 +44,6 @@ main.container:has(.book-list-section) {
   gap: 36px;
 }
 
-/* [추가 구현] 선반판과 오른쪽 아래 그림자 */
 .book-shelf::after {
   content: "";
   position: absolute;
@@ -69,12 +65,10 @@ main.container:has(.book-list-section) {
   pointer-events: none;
 }
 
-/* [추가 구현] 책 너비 고정 */
 .book-shelf > .book-card {
   flex: 0 0 180px;
 }
 
-/* [추가 구현] 신규 등록 버튼의 종이 모서리 */
 .book-list-section .page-title .btn {
   position: relative;
   overflow: hidden;
