@@ -1,5 +1,7 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import { isUnsavedCover } from "../api/images.js";
+import CoverGenerator from "./CoverGenerator.jsx";
 
 // 입력 최대 글자 수 (유효성 검사: 길이 제한)
 const MAX_LENGTH = {
@@ -17,6 +19,9 @@ export default function BookForm({
   onSubmit,
 }) {
     const { title, author, content, coverImageUrl } = form
+    const [isGenerating, setIsGenerating] = useState(false)
+    // 생성만 하고 아직 저장하지 않은 표지 (저장할 때 이미지 서버에 업로드됨)
+    const unsavedCover = isUnsavedCover(coverImageUrl)
 
     // 입력 칸의 name을 키로 써서, 기존 값은 복사하고 바뀐 칸만 덮어씀 (불변 업데이트)
     function handleChange(event) {
@@ -28,103 +33,10 @@ export default function BookForm({
         setForm((prev) => ({ ...prev, coverImageUrl: url }))
     }
 
-    const [apiKey, setApiKey] = useState('')
-    const [isGenerating, setIsGenerating] = useState(false)
-
-    const OPENAI_IMAGE_API_URL = "https://api.openai.com/v1/images/generations" 
-
-    async function handleGenerateCover() {
-        const key = apiKey.trim();
-
-        if (!key) {
-            alert("API 키를 입력해주세요.");
-            return;
+    function handleCancel(event) {
+        if (unsavedCover && !window.confirm("저장하지 않은 표지는 사라져요. 나갈까요?")) {
+            event.preventDefault()
         }
-
-        if (!title.trim() || !author.trim() || !content.trim()) {
-            alert("책 제목, 저자, 내용을 먼저 입력해주세요.");
-            return;
-        }
-
-        const prompt = `
-        # 역할
-        전문 책 표지 생성 AI
-
-        # 지침
-        - 주어진 책 이름, 작가, 내용을 바탕으로 가장 적합한 책 표지 만들기
-        - 책 이름과 작가 이름이 표지에 나오도록 하기
-
-        제목: ${title}
-        작가: ${author}
-        내용: ${content}
-        `;
-
-        setIsGenerating(true);
-
-        try {
-            const res = await fetch(OPENAI_IMAGE_API_URL, {
-                method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                    Authorization: `Bearer ${key}`,
-                },
-                body: JSON.stringify({
-                    model: "gpt-image-2",
-                    prompt,
-                    n: 1,
-                    size: "1024x1536",
-                    quality: "low",
-                    output_format: "png",
-                }),
-            });
-
-            if (!res.ok) {
-                const errorData = await res.json();
-                throw new Error(
-                    errorData.error?.message || "표지 생성에 실패했습니다."
-                );
-            }
-
-            const data = await res.json();
-            const b64Json = data.data?.[0]?.b64_json;
-
-            if (!b64Json) {
-                throw new Error("생성된 이미지를 찾을 수 없습니다.");
-            }
-
-            // Base64를 이미지 파일로 변환
-            const blob = await fetch(`data:image/png;base64,${b64Json}`).then(res => res.blob())
-
-            const formData = new FormData()
-            formData.append('image', blob, 'book-cover.png')
-
-            // 이미지 서버에 업로드
-            const uploadRes = await fetch('http://localhost:3001/upload', {
-                method: 'POST',
-                body: formData,
-            })
-
-            if (!uploadRes.ok) {
-                throw new Error('이미지 업로드에 실패했습니다.')
-            }
-
-            const uploadData = await uploadRes.json()
-
-            // 이미지 경로만 저장
-            setCoverImageUrl(uploadData.imageUrl)
-
-            alert('표지가 생성되었습니다.')
-        } catch (error) {
-            console.error(error);
-            alert(error.message);
-        } finally {
-            setIsGenerating(false);
-            setApiKey("");
-        }
-    }
-
-    function handleRemoveCover() {
-        setCoverImageUrl('')
     }
 
     return (
@@ -136,13 +48,13 @@ export default function BookForm({
                     <div className="book-form-img">
                         {coverImageUrl ? (
                             <>
-                                <img src={coverImageUrl} alt="생성된 책 표지" />
+                                <img src={coverImageUrl} alt="책 표지" />
 
                                 <button
                                     type="button"
                                     className="book-form-img-remove"
-                                    onClick={handleRemoveCover}
-                                    disabled={isGenerating}
+                                    onClick={() => setCoverImageUrl('')}
+                                    disabled={isGenerating || submitting}
                                     title="표지 삭제"
                                 >
                                     ×
@@ -152,28 +64,25 @@ export default function BookForm({
                             <span>표지 없음</span>
                         )}
                     </div>
-                    <input type="password" value={apiKey} onChange={event=> setApiKey(event.target.value)} placeholder="API키를 입력하세요."/>
-                    <div className="book-form-img-button">
-                        {!coverImageUrl ? (
-                            <button
-                                type="button"
-                                className="btn btn-primary"
-                                onClick={handleGenerateCover}
-                                disabled={isGenerating}
-                            >
-                                {isGenerating ? "생성 중..." : "생성"}
-                            </button>
-                        ) : (
-                            <button
-                                type="button"
-                                className="btn btn-danger"
-                                onClick={handleGenerateCover}
-                                disabled={isGenerating}
-                            >
-                                {isGenerating ? "생성 중..." : "재생성"}
-                            </button>
-                        )}
-                    </div>
+
+                    {unsavedCover && (
+                        <p className="cover-unsaved-notice">
+                            아직 저장되지 않은 표지예요. 저장하지 않고 나가면 사라져요.
+                        </p>
+                    )}
+
+                    <CoverGenerator
+                        title={title}
+                        author={author}
+                        content={content}
+                        hasCover={Boolean(coverImageUrl)}
+                        onGenerated={setCoverImageUrl}
+                        onBusyChange={setIsGenerating}
+                        successMessage="표지를 만들었어요. 저장해야 반영돼요"
+                        description="입력한 제목·저자·내용으로 표지를 그려요. API 키는 저장되지 않아요."
+                        disabled={submitting}
+                        stacked
+                    />
                 </div>
                 <form className="form" onSubmit={onSubmit}>
                     <label>
@@ -221,13 +130,18 @@ export default function BookForm({
                     {error && <p className="error">{error}</p>}
 
                     <div className="book-form-button">
-                        <Link to="/" className="btn">취소</Link>
-                        <button className="btn btn-primary" type="submit" disabled={submitting}>
-                            {submitting ? '저장 중…' : '저장'}
+                        <Link to="/" className="btn" onClick={handleCancel}>취소</Link>
+                        <button
+                            className="btn btn-primary"
+                            type="submit"
+                            disabled={submitting || isGenerating}
+                            title={isGenerating ? "표지를 만드는 중에는 저장할 수 없어요" : undefined}
+                        >
+                            {submitting ? '저장 중…' : isGenerating ? '표지 생성 중…' : '저장'}
                         </button>
                     </div>
                 </form>
             </div>
         </section>
-    )   
+    )
 }
