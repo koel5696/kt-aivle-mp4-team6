@@ -10,6 +10,7 @@ export default function BookDetail() {
   const { book, loading, error: loadError } = useBook(id)
   const [error, setError] = useState(null) // 삭제 실패 메시지
   const [deleting, setDeleting] = useState(false)
+  
   const [apiKey, setApiKey] = useState('')
   const [isGenerating, setIsGenerating] = useState(false)
   const [quality, setQuality] = useState('low')
@@ -79,12 +80,12 @@ export default function BookDetail() {
               output_format:'png'
           })
       });
-      console.log(res.json())
+
       if(!res.ok){ 
         setIsGenerating(false);
         throw new Error('OpenAI 표지 생성 불가...');
       }
-
+      console.log(res);
       const data = await res.json();
       const b64Json = data.data?.[0]?.b64_json;
 
@@ -102,10 +103,9 @@ export default function BookDetail() {
               },
               body: JSON.stringify({
                   coverImageUrl: imageSrc,
-                  updatedAt: Date.now()
+                  updatedAt: new Date().toISOString()
               }),
           });
-          navigate('/')
       }catch(e){
           console.log(e.message);
       }finally{
