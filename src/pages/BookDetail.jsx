@@ -5,6 +5,7 @@ import useBook from '../hooks/useBook.js'
 import { useToast } from '../contexts/ToastContext.js'
 import CoverGenerator from '../components/CoverGenerator.jsx'
 import '../styles/BookDetail.css'
+import NotFound from './NotFound.jsx'
 
 // 2026년 11월 23일 형태로 표시
 function formatDate(iso) {
@@ -40,15 +41,13 @@ export default function BookDetail() {
 
   if (loading) return <p>불러오는 중…</p>
   if (!book) {
-    const message = loadError ?? '도서를 찾을 수 없습니다'
-    return (
-      <section>
-        <p className="error">{message}</p>
-        <div className="actions">
-          <Link to="/" className="btn">목록으로</Link>
-        </div>
-      </section>
-    )
+    if (loadError === '서버에 연결할 수 없습니다') {
+      return <NotFound title="서버에 연결할 수 없어요" desc="잠시 후 다시 시도해주세요." />
+    }
+    if (loadError && loadError !== '도서를 찾을 수 없습니다') {
+      return <NotFound title="도서를 불러오지 못했어요" desc={loadError} />
+    }
+    return <NotFound title="도서를 찾을 수 없어요" desc="삭제되었거나 존재하지 않는 도서예요." />
   }
 
   const coverImageUrl = newCover ?? book.coverImageUrl

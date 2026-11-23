@@ -1,11 +1,12 @@
 import { useState } from 'react'
-import { Link, useNavigate, useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 import { updateBook } from '../api/books.js'
 import { isUnsavedCover, uploadCover } from '../api/images.js'
 import useBook from '../hooks/useBook.js'
 import BookForm from '../components/BookForm.jsx'
 import { useToast } from '../contexts/ToastContext.js'
 import '../styles/BookForm.css'
+import NotFound from './NotFound.jsx'
 
 export default function BookEdit() {
   const { id } = useParams()
@@ -21,16 +22,13 @@ export default function BookEdit() {
   }
 
   if (!book) {
-    const message = error ?? '도서를 찾을 수 없습니다'
-    return (
-      <section>
-        <h2>도서 수정</h2>
-        <p className="error">{message}</p>
-        <div className="actions">
-          <Link to="/" className="btn">목록으로</Link>
-        </div>
-      </section>
-    )
+    if (error === '서버에 연결할 수 없습니다') {
+      return <NotFound title="서버에 연결할 수 없어요" desc="잠시 후 다시 시도해주세요." />
+    }
+    if (error && error !== '도서를 찾을 수 없습니다') {
+      return <NotFound title="도서를 불러오지 못했어요" desc={error} />
+    }
+    return <NotFound title="도서를 찾을 수 없어요" desc="삭제되었거나 존재하지 않는 도서예요." />
   }
 
   // 불러온 도서로 폼 초기값을 채움 (key: 다른 도서로 이동하면 폼을 새로 만듦)
