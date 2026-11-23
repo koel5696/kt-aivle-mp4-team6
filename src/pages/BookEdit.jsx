@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { updateBook } from '../api/books.js'
+import { isUnsavedCover, uploadCover } from '../api/images.js'
 import useBook from '../hooks/useBook.js'
 import BookForm from '../components/BookForm.jsx'
 import { useToast } from '../contexts/ToastContext.js'
@@ -20,12 +21,15 @@ export default function BookEdit() {
     )
   }
 
-    if (!book) {
-      if (error === '서버에 연결할 수 없습니다') {
-        return <NotFound title="서버에 연결할 수 없어요" desc="잠시 후 다시 시도해주세요." />
-      }
-      return <NotFound title="도서를 찾을 수 없어요" desc="삭제되었거나 존재하지 않는 도서예요." />
+  if (!book) {
+    if (error === '서버에 연결할 수 없습니다') {
+      return <NotFound title="서버에 연결할 수 없어요" desc="잠시 후 다시 시도해주세요." />
     }
+    if (error && error !== '도서를 찾을 수 없습니다') {
+      return <NotFound title="도서를 불러오지 못했어요" desc={error} />
+    }
+    return <NotFound title="도서를 찾을 수 없어요" desc="삭제되었거나 존재하지 않는 도서예요." />
+  }
 
   // 불러온 도서로 폼 초기값을 채움 (key: 다른 도서로 이동하면 폼을 새로 만듦)
   return <BookEditForm key={book.id} book={book} />
@@ -70,6 +74,10 @@ function BookEditForm({ book }) {
     setSubmitting(true)
     setError(null)
     try {
+      // 새로 생성한 표지는 저장할 때 이미지 서버에 올림 (저장하지 않고 나가면 버려짐)
+      if (isUnsavedCover(patch.coverImageUrl)) {
+        patch.coverImageUrl = await uploadCover(patch.coverImageUrl)
+      }
       await updateBook(book.id, patch)
       toast.success('수정 내용을 저장했어요')
       navigate(`/books/${book.id}`)
