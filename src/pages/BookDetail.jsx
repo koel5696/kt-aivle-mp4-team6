@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { deleteBook } from '../api/books.js'
+import { deleteBook, updateBook } from '../api/books.js'
 import useBook from '../hooks/useBook.js'
 import { useToast } from '../contexts/ToastContext.js'
 import '../styles/BookDetail.css'
@@ -15,6 +15,7 @@ export default function BookDetail() {
   const [apiKey, setApiKey] = useState('')
   const [isGenerating, setIsGenerating] = useState(false)
   const [quality, setQuality] = useState('low')
+  const [generatedCover, setGeneratedCover] = useState(null)
   
   async function handleDelete() {
     if (!book || !window.confirm(`「${book.title}」을(를) 삭제할까요?`)) return
@@ -43,86 +44,77 @@ export default function BookDetail() {
     )
   }
 
-  const OPENAI_IMAGE_API_URL = "https://api.openai.com/v1/images/generations" 
-  const API_BASE = 'http://localhost:3000/books/'
+  async function handleGenerateCover() {
+    const key = apiKey.trim()
+    if (!key) {
+      toast.error('API 키를 입력해주세요')
+      return
+    }
 
-  async function handleGenerateCover(){
-      
-      const prompt = `
-      #역할
-      전문 책 표지 생성 AI
-      #지침
-      - 주어진 책 이름, 작가, 내용을 바탕으로 가장 적합한 책 표지 만들어
-      - 책 이름, 작가 이름이 표지에 나오도록
-      - 
-      제목: ${book.title}
-      작가: ${book.author}
-      내용: ${book.content}
-      
-      `
-      if(!apiKey.trim()) return;
+    const prompt = `책 제목과 작가 이름이 포함된 책 표지를 만들어주세요.
+제목: ${book.title}
+작가: ${book.author}
+내용: ${book.content}`
 
-      setApiKey(apiKey.trim());
-      setIsGenerating(true);
+    setIsGenerating(true)
+    try {
+      const res = await fetch('https://api.openai.com/v1/images/generations', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${key}`,
+        },
+        body: JSON.stringify({
+          model: 'gpt-image-2',
+          prompt,
+          n: 1,
+          size: '1024x1536',
+          quality,
+          output_format: 'png',
+        }),
+      })
 
-      const res = await fetch(OPENAI_IMAGE_API_URL, {
-          method: 'POST',
-          headers: {
-              'Content-Type': 'application/json',
-              Authorization:`Bearer ${apiKey}`
-          },
-
-          body:JSON.stringify({
-              model: 'gpt-image-2',
-              prompt,
-              n:1,
-              size:'1024x1536',
-              quality: `${quality}`,
-              output_format:'png'
-          })
-      });
-
-      if(!res.ok){ 
-        setIsGenerating(false);
-        throw new Error('OpenAI 표지 생성 불가...');
-      }
-      console.log(res);
-      const data = await res.json();
-      const b64Json = data.data?.[0]?.b64_json;
-
-      if(!b64Json){
-        setIsGenerating(false);
-        throw new Error('이미지 ');
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => null)
+        throw new Error(errorData?.error?.message || '표지 생성에 실패했어요')
       }
 
-      const imageSrc = `data:image/png;base64,${b64Json}`;
-      try{
-          await fetch(`${API_BASE}${book.id}`, {
-              method: 'PATCH',
-              headers: {
-                  'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({
-                  coverImageUrl: imageSrc,
-                  updatedAt: new Date().toISOString()
-              }),
-          });
-      }catch(e){
-          console.log(e.message);
-      }finally{
-        setIsGenerating(false);
-        setApiKey('');
-      }
+      const data = await res.json()
+      const b64Json = data.data?.[0]?.b64_json
+      if (!b64Json) throw new Error('생성된 이미지를 찾을 수 없어요')
+
+      const blob = await fetch(`data:image/png;base64,${b64Json}`).then((response) => response.blob())
+      const formData = new FormData()
+      formData.append('image', blob, 'book-cover.png')
+      const uploadRes = await fetch('http://localhost:3001/upload', {
+        method: 'POST',
+        body: formData,
+      })
+      if (!uploadRes.ok) throw new Error('이미지 업로드에 실패했어요')
+      const { imageUrl } = await uploadRes.json()
+      if (!imageUrl) throw new Error('업로드된 이미지 주소가 없어요')
+
+      await updateBook(book.id, { coverImageUrl: imageUrl })
+      setGeneratedCover({ id, url: imageUrl })
+      toast.success('표지가 생성되었어요')
+    } catch (err) {
+      toast.error(`표지 생성에 실패했어요 (${err.message})`)
+    } finally {
+      setIsGenerating(false)
+      setApiKey('')
+    }
   }
+
+  const coverImageUrl = generatedCover?.id === id ? generatedCover.url : book.coverImageUrl
 
   return (
     <div className='book-detail-section'>
       <h2>도서 정보</h2>
       <section className="detail">
         <div className="detail-img">
-          {book.coverImageUrl ? (
+          {coverImageUrl ? (
             <img
-              src={book.coverImageUrl}
+              src={coverImageUrl}
               alt={`${book.title} 표지`}
             />
           ) : (
@@ -156,34 +148,13 @@ export default function BookDetail() {
                 <option value="high">High</option>
                 <option value="auto">Auto</option>
               </select>
-              {console.log(quality)}
               <div className="book-form-img-button">
-                  <button className="btn btn-primary" type="submit"  onClick={handleGenerateCover} disabled={isGenerating}>
-                    {isGenerating ? "생성 중 ...": "AI 표지 생성"} </button>
-                  <button className="btn btn-danger" type="submit"  onClick={handleGenerateCover} disabled={isGenerating}>
-                    {isGenerating ? "생성 중 ...": "AI 표지 재생성"} </button>
+                <button className={coverImageUrl ? 'btn btn-danger' : 'btn btn-primary'} type="button" onClick={handleGenerateCover} disabled={isGenerating}>
+                  {isGenerating ? '생성 중 ...' : coverImageUrl ? 'AI 표지 재생성' : 'AI 표지 생성'}
+                </button>
               </div>
           </div>
 
-
-          {/* <div className="genCover">
-            <div className = "apiDiv">
-              <label htmlFor="quality">API KEY:</label>
-              <input placeholder="OPENAI API KEY" type="password" value={apiKey} onChange={event=> setApiKey(event.target.value)}/>
-              <label htmlFor="quality">표지 화질:</label>
-              <select id="qualitySelector" name="quality" onChange={event => setQuality(event.target.value)}>
-                <option value="low">Low</option>
-                <option value="medium">Medium</option>
-                <option value="high">High</option>
-                <option value="auto">Auto</option>
-              </select>
-              
-            </div>
-            <div className="book-form-img-button">
-              <button className="btn btn-primary" type="button" onClick={handleGenerateCover} disabled= {isGenerating}>
-                {isGenerating? "생성 중 ...": "AI 표지 생성"}</button>
-            </div>
-          </div> */}
         </div>
       </section>
     </div>
