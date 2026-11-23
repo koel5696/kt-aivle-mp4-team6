@@ -1,27 +1,42 @@
+main.container:has(.book-detail-section) {
+    max-width: 1280px;
+}
+
 .book-detail-section {
     display: flex;
     flex-direction: column;
+    width: 100%;
+    max-width: 1080px;
+    padding-top: 12px;
+}
+
+/* 상단 뒤로가기 */
+.detail-back {
+    align-self: flex-start;
+    color: var(--muted);
+    font-size: 14px;
+    padding: 4px 0;
+}
+.detail-back:hover {
+    color: var(--text);
+}
+
+.detail {
+    display: flex;
+    gap: 40px;
     padding-top: 20px;
 }
 
-.detail { 
-    display: flex;
-    gap: 32px;
-    padding-top: 40px;
-}
-
+/* ───── 왼쪽: 표지 ───── */
 .detail-img {
     width: 280px;
-    height: 400px;
-    min-height: 220px;
     flex-shrink: 0;
-    
-    display: flex;
-    justify-content: center;
-    align-items: center;
-
+    align-self: flex-start;
+    aspect-ratio: 7 / 10;
+    border-radius: 4px 10px 10px 4px;
     background: #e0d8cd;
     overflow: hidden;
+    box-shadow: 0 10px 24px rgba(60, 40, 20, 0.18);
 }
 .detail-img img {
     width: 100%;
@@ -29,46 +44,213 @@
     object-fit: cover;
     display: block;
 }
-.detail-img span {
+
+/* 표지가 없을 때: 책 제목을 넣은 기본 표지 */
+.detail-img-empty {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    padding: 24px;
+    text-align: center;
+}
+.detail-img-empty-title {
+    color: #5e4d3d;
+    font-size: 22px;
+    font-weight: 700;
+    line-height: 1.4;
+    word-break: keep-all;
+}
+.detail-img-empty-hint {
     color: #8a7868;
-    font-size: 14px;
+    font-size: 13px;
 }
 
+/* ───── 오른쪽: 도서 정보 ───── */
 .detail-body {
     flex: 1;
     min-width: 0;
-    min-height: 400px;
-
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
+    gap: 28px;
 }
 
-.detail-body-title {
+.detail-header {
     display: flex;
     flex-direction: column;
-    gap: 4px;
+    gap: 10px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--border);
 }
-.detail-body-title h2 {
-    font-size: 28px;
+.detail-title {
+    margin: 0;
+    font-size: 32px;
+    font-weight: 700;
+    line-height: 1.3;
+    word-break: keep-all;
+    overflow-wrap: anywhere;
 }
-.detail-body-title h3 {
+.detail-author {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin: 0;
     font-size: 18px;
 }
-.detail-body-title p {
+
+/* 지은이 · 등록일 · 수정일 라벨 */
+.detail-label,
+.detail-meta dt {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: #efe9e1;
+    color: #6f5e4e;
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.detail-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 20px;
+    margin: 0;
+    color: var(--muted);
     font-size: 14px;
 }
+.detail-meta div {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.detail-meta dd {
+    margin: 0;
+}
+
+.detail-section {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+.detail-section-title {
+    margin: 0;
+    color: var(--muted);
+    font-size: 14px;
+    font-weight: 600;
+}
 .detail-content {
-    font-size: 18px;
-    max-height: 200px;
-    min-height: 0;
-    overflow-y: auto;
-    line-height: 1.6;
+    margin: 0;
+    padding: 20px 22px;
+    border-radius: 10px;
+    background: #fff;
+    border: 1px solid var(--border);
+    font-size: 17px;
+    line-height: 1.8;
+    white-space: pre-wrap;
+    word-break: keep-all;
+    overflow-wrap: anywhere;
 }
 
 .detail-buttons {
     display: flex;
     justify-content: flex-end;
     gap: 8px;
-    margin-top: 20px;
+}
+
+/* ───── 좁은 화면: 위아래로 쌓기 ───── */
+@media (max-width: 720px) {
+    .detail {
+        flex-direction: column;
+        gap: 28px;
+    }
+    .detail-img {
+        width: 100%;
+        max-width: 240px;
+        align-self: center;
+    }
+    .detail-title {
+        font-size: 26px;
+    }
+    .detail-buttons .btn {
+        flex: 1;
+        text-align: center;
+    }
+}
+
+/* ───── AI 표지 만들기 ───── */
+.cover-gen {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 20px 22px;
+    border-radius: 10px;
+    background: #faf6f0;
+    border: 1px dashed #d8cbb8;
+}
+.cover-gen-head {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+.cover-gen-desc {
+    margin: 0;
+    color: var(--muted);
+    font-size: 13px;
+}
+.cover-gen-fields {
+    display: flex;
+    gap: 12px;
+}
+.cover-gen-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    font-size: 13px;
+    font-weight: 600;
+    color: #6f5e4e;
+}
+.cover-gen-key {
+    flex: 1;
+    min-width: 0;
+}
+.cover-gen-field input,
+.cover-gen-field select {
+    width: 100%;
+    box-sizing: border-box;
+    height: 40px;
+    padding: 0 12px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    background: #fff;
+    font: inherit;
+    font-weight: 400;
+    color: var(--text);
+}
+.cover-gen-field select {
+    min-width: 140px;
+}
+.cover-gen-field input[aria-invalid="true"] {
+    border-color: var(--danger);
+    box-shadow: 0 0 0 3px rgba(224, 49, 49, 0.12);
+}
+.cover-gen-error {
+    margin: 0;
+    padding: 10px 12px;
+    border-radius: 8px;
+    background: #fff0f0;
+    color: var(--danger);
+    font-size: 14px;
+    line-height: 1.5;
+}
+.cover-gen-submit {
+    height: 44px;
+    font-weight: 600;
+}
+
+@media (max-width: 720px) {
+    .cover-gen-fields {
+        flex-direction: column;
+    }
 }

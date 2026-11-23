@@ -1,137 +1,175 @@
-/* [추가 구현] 조금 키운 고정 크기의 책 */
+/* 진열대에 세워 둔 책 한 권 */
 .book-card {
-  position: relative;
-  z-index: 1;
+  --cover-w: 174px;
+  --cover-h: 261px;
 
-  width: 180px;
-  height: 272px;
-
+  width: var(--cover-w);
   display: flex;
   flex-direction: column;
-
-  background: #fffdf8;
-  border: 1px solid rgba(81, 70, 49, 0.12);
-  overflow: hidden;
-
-  box-shadow:
-    2px 3px 3px rgba(48, 43, 33, 0.14),
-    7px 10px 14px rgba(48, 43, 33, 0.13);
-
-  transition:
-    transform 180ms ease,
-    box-shadow 180ms ease;
-}
-
-.book-card:hover {
-  transform: translateY(-3px);
-
-  box-shadow:
-    3px 5px 5px rgba(48, 43, 33, 0.14),
-    9px 14px 18px rgba(48, 43, 33, 0.15);
-}
-
-.book-card:active {
-  transform: translateY(0) scale(0.99);
+  align-items: center;
+  border-radius: 4px;
 }
 
 .book-card:focus-visible {
-  outline: 2px solid var(--primary);
-  outline-offset: 3px;
+  outline: 2px solid #8a6d3b;
+  outline-offset: 6px;
 }
 
-/* [추가 구현] 넓어진 책 크기에 맞춘 표지 */
-.book-card-img {
-  width: 100%;
-  height: 212px;
-  min-height: 212px;
-  flex-shrink: 0;
-
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
+/* ───── 표지 ───── */
+.book-card-cover {
+  position: relative;
+  width: var(--cover-w);
+  height: var(--cover-h);
+  border-radius: 2px 5px 5px 2px;
   background: #ded8cb;
   overflow: hidden;
+  transform-origin: bottom center;
+
+  box-shadow:
+    0 1px 1px rgba(40, 28, 15, 0.2),
+    4px 6px 8px rgba(40, 28, 15, 0.18),
+    10px 16px 24px rgba(40, 28, 15, 0.16);
+
+  transition:
+    transform 220ms ease,
+    box-shadow 220ms ease;
 }
 
-.book-card-img img {
+/* 책등 쪽 접힘선과 표지 광택 */
+.book-card-cover::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(
+      90deg,
+      rgba(0, 0, 0, 0.28) 0,
+      rgba(255, 255, 255, 0.22) 3px,
+      rgba(0, 0, 0, 0.08) 7px,
+      transparent 14px
+    ),
+    linear-gradient(
+      120deg,
+      rgba(255, 255, 255, 0.16) 0%,
+      transparent 35%
+    );
+}
+
+.book-card:hover .book-card-cover,
+.book-card:focus-visible .book-card-cover {
+  transform: translateY(-10px) rotate(-1.2deg);
+  box-shadow:
+    0 2px 2px rgba(40, 28, 15, 0.18),
+    8px 14px 16px rgba(40, 28, 15, 0.2),
+    16px 28px 36px rgba(40, 28, 15, 0.18);
+}
+
+.book-card:active .book-card-cover {
+  transform: translateY(-4px);
+}
+
+.book-card-cover img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
 }
 
-.book-card-img span {
-  color: #857a67;
-  font-size: 12px;
+/* 표지가 없을 때: 천 양장본 느낌의 기본 표지 */
+.book-card-placeholder {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 14px;
+  padding: 28px 20px 28px 26px;
+  text-align: center;
+
+  background:
+    repeating-linear-gradient(
+      45deg,
+      rgba(255, 255, 255, 0.03) 0 2px,
+      transparent 2px 4px
+    ),
+    var(--tone);
+  color: #f4ead8;
 }
 
-/* [추가 구현] 표지 아래의 얇은 정보 영역 */
-.book-card-body {
-  flex: 1;
-  min-height: 0;
-  padding: 4px 9px;
-}
-
-.book-card-body h3 {
-  margin: 0 0 2px;
-  font-size: 13px;
-  line-height: 1.2;
-
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.book-card-body h4 {
-  margin: 0 0 2px;
-  font-size: 12px;
-  line-height: 1.2;
-  font-weight: 400;
-  color: #777;
-
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.book-card-body p {
-  margin: 0;
-  font-size: 11px;
-  line-height: 1.2;
-  color: #888;
-}
-
-/* [추가 구현] 책장 배경색에 맞춘 오른쪽 아래 종이 모서리 */
-.book-card::after {
+.book-card-placeholder::before {
   content: "";
   position: absolute;
-  right: 0;
-  bottom: 0;
-  width: 0;
-  height: 0;
-  z-index: 3;
-
-  background: linear-gradient(
-    315deg,
-    #eeede8 43%,
-    #b8b8b3 49%,
-    #ededeb 55%,
-    #fffdf8 78%
-  );
-  box-shadow: -1px -1px 2px rgba(0, 0, 0, 0.12);
-
-  opacity: 0;
+  inset: 12px 12px 12px 18px;
+  border: 1px solid rgba(244, 234, 216, 0.45);
   pointer-events: none;
-  transition:
-    width 240ms ease,
-    height 240ms ease,
-    opacity 160ms ease;
 }
 
-.book-card:hover::after,
-.book-card:focus-visible::after {
-  width: 16px;
-  height: 16px;
-  opacity: 1;
+.book-card-placeholder-title {
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.4;
+  word-break: keep-all;
+  overflow-wrap: anywhere;
+
+  display: -webkit-box;
+  -webkit-line-clamp: 4;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.book-card-placeholder-author {
+  font-size: 12px;
+  letter-spacing: 0.08em;
+  opacity: 0.85;
+}
+
+/* ───── 선반 아래 이름표 ───── */
+.book-card-tag {
+  width: 100%;
+  margin-top: 30px; /* 선반 두께만큼 띄움 */
+  padding: 8px 10px 9px;
+
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+
+  background: #fffdf8;
+  border-top: 3px solid #b08b5a;
+  border-radius: 0 0 4px 4px;
+  box-shadow: 0 3px 6px rgba(60, 40, 20, 0.12);
+  text-align: center;
+
+  transition: border-color 200ms ease;
+}
+
+.book-card-tag strong {
+  font-size: 13px;
+  line-height: 1.3;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.book-card-tag span {
+  font-size: 11px;
+  color: #8a7868;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.book-card:hover .book-card-tag,
+.book-card:focus-visible .book-card-tag {
+  border-top-color: #7a5634;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .book-card-cover {
+    transition: none;
+  }
+  .book-card:hover .book-card-cover,
+  .book-card:focus-visible .book-card-cover {
+    transform: none;
+  }
 }

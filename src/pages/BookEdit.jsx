@@ -40,20 +40,22 @@ export default function BookEdit() {
 function BookEditForm({ book }) {
   const navigate = useNavigate()
   const toast = useToast()
-  const [title, setTitle] = useState(book.title)
-  const [author, setAuthor] = useState(book.author)
-  const [content, setContent] = useState(book.content)
+  const [form, setForm] = useState({
+    title: book.title,
+    author: book.author,
+    content: book.content,
+    coverImageUrl: book.coverImageUrl || '',
+  })
   const [error, setError] = useState(null)
   const [submitting, setSubmitting] = useState(false)
-  const [coverImageUrl, setCoverImageUrl] = useState(book.coverImageUrl || '')
 
   async function handleSubmit(event) {
     event.preventDefault()
     const next = {
-      title: title.trim(),
-      author: author.trim(),
-      content: content.trim(),
-      coverImageUrl,
+      ...form,
+      title: form.title.trim(),
+      author: form.author.trim(),
+      content: form.content.trim(),
     }
     if (!next.title || !next.author || !next.content) {
       setError('제목, 저자, 내용을 모두 입력하세요.')
@@ -84,9 +86,7 @@ function BookEditForm({ book }) {
   }
 
   return (
-    <BookForm heading={"도서 수정"} title={title} setTitle={setTitle} 
-      author={author} setAuthor={setAuthor} content={content} setContent={setContent}
-      coverImageUrl={coverImageUrl} setCoverImageUrl={setCoverImageUrl}
+    <BookForm heading={"도서 수정"} form={form} setForm={setForm}
       error={error} submitting={submitting} onSubmit={handleSubmit} />
   )
 }

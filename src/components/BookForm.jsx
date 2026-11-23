@@ -11,18 +11,23 @@ const MAX_LENGTH = {
 
 export default function BookForm({
   heading,
-  title,
-  setTitle,
-  author,
-  setAuthor,
-  content,
-  setContent,
-  coverImageUrl,
-  setCoverImageUrl,
+  form,
+  setForm,
   error,
   submitting,
   onSubmit,
 }) {
+    const { title, author, content, coverImageUrl } = form
+
+    // 입력 칸의 name을 키로 써서, 기존 값은 복사하고 바뀐 칸만 덮어씀 (불변 업데이트)
+    function handleChange(event) {
+        const { name, value } = event.target
+        setForm((prev) => ({ ...prev, [name]: value }))
+    }
+
+    function setCoverImageUrl(url) {
+        setForm((prev) => ({ ...prev, coverImageUrl: url }))
+    }
 
     const [apiKey, setApiKey] = useState('')
     const [isGenerating, setIsGenerating] = useState(false)
@@ -175,8 +180,9 @@ export default function BookForm({
                     <label>
                         책 제목
                         <input
+                            name="title"
                             value={title}
-                            onChange={(event) => setTitle(event.target.value)}
+                            onChange={handleChange}
                             placeholder="책의 제목을 작성해주세요."
                             maxLength={MAX_LENGTH.title}
                         />
@@ -188,8 +194,9 @@ export default function BookForm({
                     <label>
                         저자
                         <input
+                            name="author"
                             value={author}
-                            onChange={(event) => setAuthor(event.target.value)}
+                            onChange={handleChange}
                             placeholder="책의 저자를 작성해주세요."
                             maxLength={MAX_LENGTH.author}
                         />
@@ -201,8 +208,9 @@ export default function BookForm({
                     <label>
                         내용
                         <textarea
+                            name="content"
                             value={content}
-                            onChange={(event) => setContent(event.target.value)}
+                            onChange={handleChange}
                             placeholder="책의 내용을 작성해주세요."
                             maxLength={MAX_LENGTH.content}
                         />
