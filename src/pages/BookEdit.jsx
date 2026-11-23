@@ -43,6 +43,7 @@ function BookEditForm({ book }) {
   const [content, setContent] = useState(book.content)
   const [error, setError] = useState(null)
   const [submitting, setSubmitting] = useState(false)
+  const [coverImageUrl, setCoverImageUrl] = useState(book.coverImageUrl || '')
 
   async function handleSubmit(event) {
     event.preventDefault()
@@ -50,6 +51,7 @@ function BookEditForm({ book }) {
       title: title.trim(),
       author: author.trim(),
       content: content.trim(),
+      coverImageUrl,
     }
     if (!next.title || !next.author || !next.content) {
       setError('제목, 저자, 내용을 모두 입력하세요.')
@@ -60,6 +62,7 @@ function BookEditForm({ book }) {
     if (next.title !== book.title) patch.title = next.title
     if (next.author !== book.author) patch.author = next.author
     if (next.content !== book.content) patch.content = next.content
+    if (next.coverImageUrl !== (book.coverImageUrl || '')) {patch.coverImageUrl = next.coverImageUrl}
     if (Object.keys(patch).length === 0) {
       navigate(`/books/${book.id}`)
       return
@@ -79,6 +82,7 @@ function BookEditForm({ book }) {
   return (
     <BookForm heading={"도서 수정"} title={title} setTitle={setTitle} 
       author={author} setAuthor={setAuthor} content={content} setContent={setContent}
+      coverImageUrl={coverImageUrl} setCoverImageUrl={setCoverImageUrl}
       error={error} submitting={submitting} onSubmit={handleSubmit} />
   )
 }
