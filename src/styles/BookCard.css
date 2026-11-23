@@ -172,3 +172,9 @@
     transform: none;
   }
 }
+
+@media (max-width: 599px) {
+  .book-card-placeholder-title {
+    font-size: 14px;
+}
+}
