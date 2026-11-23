@@ -90,13 +90,12 @@ main.container:has(.book-form) {
   flex: 1;
 }
 
-.form { 
-    flex: 1;
-    min-width: 0;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    gap: 14px;
+.form {
+    width: 100%;
+    display: flex; 
+    flex-direction: column; 
+    align-self: flex-start; /* 왼쪽 표지 영역이 길어져도 입력 칸이 벌어지지 않게 */
+    gap: 14px; 
 }
 .form label { 
     display: flex; 
@@ -163,6 +162,12 @@ main.container:has(.book-form) {
     }
 
     .book-form-img-section {
+        width: 100%;
+        max-width: none;
+        align-self: stretch;
+    }
+
+    .book-form-img {
         width: 100%;
         max-width: 240px;
         align-self: center;

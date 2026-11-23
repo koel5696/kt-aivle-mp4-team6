@@ -159,26 +159,6 @@ main.container:has(.book-detail-section) {
     gap: 8px;
 }
 
-/* ───── 좁은 화면: 위아래로 쌓기 ───── */
-@media (max-width: 720px) {
-    .detail {
-        flex-direction: column;
-        gap: 28px;
-    }
-    .detail-img {
-        width: 100%;
-        max-width: 240px;
-        align-self: center;
-    }
-    .detail-title {
-        font-size: 26px;
-    }
-    .detail-buttons .btn {
-        flex: 1;
-        text-align: center;
-    }
-}
-
 /* ───── AI 표지 만들기 ───── */
 .cover-gen {
     display: flex;
@@ -255,8 +235,22 @@ main.container:has(.book-detail-section) {
     }
 }
 
+/* ───── 좁은 화면: 위아래로 쌓기 ───── */
 @media (max-width: 720px) {
-    .cover-gen-fields {
+    .detail {
         flex-direction: column;
+        gap: 28px;
+    }
+    .detail-img {
+        width: 100%;
+        max-width: 240px;
+        align-self: center;
+    }
+    .detail-title {
+        font-size: 26px;
+    }
+    .detail-buttons .btn {
+        flex: 1;
+        text-align: center;
     }
 }
