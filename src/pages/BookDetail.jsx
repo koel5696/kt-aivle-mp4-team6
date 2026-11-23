@@ -2,24 +2,25 @@ import { useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
 import { deleteBook } from '../api/books.js'
 import useBook from '../hooks/useBook.js'
+import { useToast } from '../contexts/ToastContext.js'
 import '../styles/BookDetail.css'
 
 export default function BookDetail() {
   const { id } = useParams()
   const navigate = useNavigate()
+  const toast = useToast()
   const { book, loading, error: loadError } = useBook(id)
-  const [error, setError] = useState(null) // 삭제 실패 메시지
   const [deleting, setDeleting] = useState(false)
 
   async function handleDelete() {
-    if (!book || !window.confirm('이 도서를 삭제할까요?')) return
+    if (!book || !window.confirm(`「${book.title}」을(를) 삭제할까요?`)) return
     setDeleting(true)
-    setError(null)
     try {
       await deleteBook(book.id)
+      toast.success(`「${book.title}」을(를) 삭제했어요`)
       navigate('/')
     } catch (err) {
-      setError(err.message)
+      toast.error(`도서 삭제에 실패했어요 (${err.message})`)
       setDeleting(false)
     }
   }
@@ -62,12 +63,11 @@ export default function BookDetail() {
             </p>
           </div>
           <p className="detail-content">{book.content}</p>
-          {error && <p className="error">{error}</p>}
 
           <div className="detail-buttons">
             <Link to={`/books/${book.id}/edit`} className="btn btn-primary">수정</Link>
             <button className="btn btn-danger" type="button" onClick={handleDelete} disabled={deleting}>
-              삭제
+              {deleting ? '삭제 중…' : '삭제'}
             </button>
             {/* <button className="btn btn-primary" type="button" disabled>AI 표지 생성</button> */}
           </div>

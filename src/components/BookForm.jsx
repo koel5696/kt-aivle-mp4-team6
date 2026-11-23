@@ -83,7 +83,7 @@ export default function BookForm({
                     <div className="book-form-button">
                         <Link to="/" className="btn">취소</Link>
                         <button className="btn btn-primary" type="submit" disabled={submitting}>
-                            저장
+                            {submitting ? '저장 중…' : '저장'}
                         </button>
                     </div>
                 </form>
