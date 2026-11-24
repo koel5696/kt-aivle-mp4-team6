@@ -125,6 +125,54 @@
 
 <br>
 
+## 🖼 주요 화면
+
+로컬에서 두 서버를 띄운 뒤 [http://localhost:5173](http://localhost:5173)으로 접속한 화면입니다.
+
+### 도서 목록 (`/`)
+
+![도서 목록](docs/screenshots/list.png)
+
+등록된 도서를 책장 카드로 한눈에 보고, 제목·저자 검색과 표지 유무 필터, 페이지네이션으로 찾아볼 수 있어요.
+
+### 도서 상세 (`/books/:id`)
+
+![도서 상세](docs/screenshots/detail.png)
+
+표지 · 제목 · 지은이 · 등록일 · 수정일 · 책 소개를 확인해요. 표지가 있으면 [커버 이미지 다운로드]로 받을 수 있고, [수정하기]와 [삭제]도 여기서 진행해요.
+
+### 도서 등록 (`/books/new`)
+
+![도서 등록](docs/screenshots/create.png)
+
+제목 · 저자 · 내용을 입력하고, 왼쪽 **AI 표지 만들기**에서 OpenAI API 키와 화질을 선택한 뒤 표지를 생성해 저장해요. 이 화면은 API 키 입력칸을 비워 둔 상태입니다.
+
+### 도서 수정 (`/books/:id/edit`)
+
+![도서 수정](docs/screenshots/edit.png)
+
+기존 제목 · 저자 · 내용 · 표지가 폼에 채워지고, 같은 AI 표지 만들기로 표지를 다시 만들 수 있어요.
+
+### 없는 도서 (`/books/:id`)
+
+![없는 도서](docs/screenshots/not-found.png)
+
+존재하지 않는 도서 ID로 상세 페이지에 들어오면 **"도서를 찾을 수 없어요"**와 [목록으로 돌아가기]가 보여요.
+
+### 잘못된 경로
+
+![잘못된 경로](docs/screenshots/page-not-found.png)
+
+없는 주소로 접속하면 **"길을 잃으셨나요?"** 안내가 나와요.
+
+### 서버 연결 실패
+
+![서버 연결 실패](docs/screenshots/server-error.png)
+
+json-server가 꺼져 있으면 목록에 **"서버에 연결할 수 없습니다"**가 표시돼요.
+
+<br>
+
 ## 🔄 사용자 시나리오
 
 > 김작가가 「새벽 3시의 편의점」을 등록하고 AI 표지를 만드는 흐름
@@ -201,6 +249,13 @@
 
 ## 🚀 실행 방법
 
+### 준비물
+
+- **Node.js 22** (GitHub Actions CI와 동일한 버전, 22 이상을 권장합니다)
+- npm, Git
+
+### 로컬에서 실행하기
+
 ```bash
 # 1. 저장소 클론
 git clone https://github.com/koel5696/kt-aivle-mp4-team6.git
@@ -218,9 +273,38 @@ npm run dev
 # → http://localhost:5173
 ```
 
-> ⚠️ 두 서버를 **동시에** 실행해야 합니다.
+브라우저에서 [http://localhost:5173](http://localhost:5173)을 엽니다. 두 서버를 **동시에** 실행해야 도서 데이터가 보여요.
+
+> ⚠️ 명령을 반드시 **프로젝트 폴더**(`kt-aivle-mp4-team6`)에서 실행하세요. 다른 폴더에서 `json-server`를 실행하면 기본 예시 `db.json`이 새로 만들어지고, 이 프로젝트의 도서 데이터가 보이지 않습니다.
 > ⚠️ OpenAI API Key는 화면의 입력창에 직접 입력하며, 코드나 GitHub에 절대 올리지 않습니다.
-> 💡 Windows PowerShell에서 `npm` 실행이 보안 오류로 막히면 `npm.cmd install`, `npm.cmd run server`, `npm.cmd run dev` 처럼 `npm.cmd`로 실행합니다.
+> 💡 Windows PowerShell에서 `npm` 실행이 보안 오류로 막히면 `npm.cmd install`, `npm.cmd run server`, `npm.cmd run dev`처럼 `npm.cmd`로 실행합니다.
+
+### AI 표지 생성
+
+- 도서 **등록**(`/books/new`) 또는 **수정**(`/books/:id/edit`) 화면 왼쪽의 **AI 표지 만들기**에서 OpenAI API 키를 입력합니다.
+- 입력칸은 `password` 타입이며, 키는 코드나 브라우저에 저장되지 않습니다.
+- 화질은 Low(빠름) / Medium(보통) / High(느림) / Auto(자동) 중에서 선택할 수 있습니다.
+- 생성할 때마다 OpenAI 요금이 발생합니다. 화면 안내를 확인하고, 생성이 끝나면 토스트에 대략적인 비용이 표시됩니다.
+- 제목 · 저자 · 내용을 먼저 입력한 뒤 [AI 표지 만들기]를 누르세요. **새 도서를 등록할 때는 표지를 만든 다음에 저장할 수 있습니다.**
+
+### 표지 다운로드
+
+- 상세 페이지에서 표지가 있는 도서만 [커버 이미지 다운로드] 버튼이 활성화됩니다. 표지가 없으면 버튼이 비활성화됩니다.
+
+### 문제가 생겼을 때
+
+**포트 3000이 이미 사용 중일 때**
+
+```bash
+lsof -i :3000
+kill <PID>
+```
+
+프로세스를 종료한 뒤 다시 `npm run server`를 실행합니다.
+
+**전역 json-server를 사용하지 마세요**
+
+`npm install -g json-server`로 설치한 전역 버전은 프로젝트의 **0.17.4**와 다를 수 있습니다. 버전이 다르면 표지 이미지가 저장되거나 불러와지지 않을 수 있으니, 반드시 `npm run server` 또는 `npx json-server@0.17.4 --watch db.json --port 3000`을 사용하세요.
 
 ### Vercel 배포본 사용 시
 
