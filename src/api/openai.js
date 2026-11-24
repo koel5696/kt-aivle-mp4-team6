@@ -43,9 +43,10 @@ export async function generateCoverImage({ apiKey, quality, title, author, conte
         model: 'gpt-image-2',
         prompt,
         n: 1,
+        output_compression:20,
         size: '1024x1536',
         quality,
-        output_format: 'png',
+        output_format: 'webp',
       }),
     })
   } catch {
@@ -61,7 +62,15 @@ export async function generateCoverImage({ apiKey, quality, title, author, conte
 
   const data = await res.json()
   const b64Json = data.data?.[0]?.b64_json
+
+  const inputCost = 8
+  const outputCost = 30
+  const cost = (data.usage?.input_tokens/1000000*inputCost) + (data.usage?.output_tokens/1000000*outputCost) //2026 11월 gpt-image-2 비용 기준
+  
   if (!b64Json) throw new Error('생성된 이미지를 받지 못했어요. 다시 시도해 주세요.')
 
-  return `data:image/png;base64,${b64Json}`
+  return {
+    imageUrl:`data:image/webp;base64,${b64Json}`, 
+    cost: cost
+  }
 }

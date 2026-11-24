@@ -76,7 +76,7 @@ function BookEditForm({ book }) {
     try {
       // 새로 생성한 표지는 저장할 때 이미지 서버에 올림 (저장하지 않고 나가면 버려짐)
       if (isUnsavedCover(patch.coverImageUrl)) {
-        patch.coverImageUrl = await uploadCover(patch.coverImageUrl)
+        patch.coverImageUrl = await uploadCover(book.id, patch.coverImageUrl)
       }
       await updateBook(book.id, patch)
       toast.success('수정 내용을 저장했어요')

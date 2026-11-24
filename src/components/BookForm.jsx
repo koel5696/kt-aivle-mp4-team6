@@ -79,7 +79,7 @@ export default function BookForm({
                         onGenerated={setCoverImageUrl}
                         onBusyChange={setIsGenerating}
                         successMessage="표지를 만들었어요. 저장해야 반영돼요"
-                        description="입력한 제목·저자·내용으로 표지를 그려요. API 키는 저장되지 않아요."
+                        description="입력한 제목·저자·내용으로 표지를 그려요. API 키는 저장되지 않고 호출시 비용이 발생해요."
                         disabled={submitting}
                         stacked
                     />

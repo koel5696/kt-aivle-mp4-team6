@@ -42,16 +42,16 @@ export default function CoverGenerator({
     setBusy(true)
     setError(null)
     try {
-      const dataUrl = await generateCoverImage({
+      const data = await generateCoverImage({
         apiKey: key,
         quality,
         title: title.trim(),
         author: author.trim(),
         content: content.trim(),
       })
-      await onGenerated(dataUrl)
+      await onGenerated(data.imageUrl)
       setApiKey('')
-      toast.success(successMessage)
+      toast.success(`${successMessage} (비용: 약 $${data.cost.toFixed(4)})`)
     } catch (err) {
       // 실패하면 입력한 키는 그대로 두어 바로 고칠 수 있게 함
       setError(err.message)
