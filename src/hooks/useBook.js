@@ -14,16 +14,21 @@ function getLoadErrorMessage(err) {
 // - error: 불러오기 실패 문구 (연결 실패 / 없는 도서 / 그 밖의 오류를 상태 코드로 구분)
 export default function useBook(id) {
   const [result, setResult] = useState({ id: null, book: null, error: null })
-
+  
   useEffect(() => {
     let cancelled = false
-    getBook(id)
-      .then((book) => {
+
+    async function loadBook() {
+      try {
+        const book = await getBook(id)
         if (!cancelled) setResult({ id, book, error: null })
-      })
-      .catch((err) => {
+      } catch (err) {
         if (!cancelled) setResult({ id, book: null, error: getLoadErrorMessage(err) })
-      })
+      }
+    }
+
+    loadBook()
+
     return () => {
       cancelled = true
     }
