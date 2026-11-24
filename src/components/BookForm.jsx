@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { isUnsavedCover } from "../api/images.js";
 import CoverGenerator from "./CoverGenerator.jsx";
 
 // 입력 최대 글자 수 (유효성 검사: 길이 제한)
@@ -17,11 +16,14 @@ export default function BookForm({
   error,
   submitting,
   onSubmit,
+  onCoverChange,
 }) {
     const { title, author, content, coverImageUrl } = form
     const [isGenerating, setIsGenerating] = useState(false)
-    // 생성만 하고 아직 저장하지 않은 표지 (저장할 때 이미지 서버에 업로드됨)
-    const unsavedCover = isUnsavedCover(coverImageUrl)
+
+    const [isUnsavedCover, setIsUnsavedCover] = useState(false)
+
+    const unsavedCover = Boolean(coverImageUrl) && isUnsavedCover
 
     // 입력 칸의 name을 키로 써서, 기존 값은 복사하고 바뀐 칸만 덮어씀 (불변 업데이트)
     function handleChange(event) {
@@ -31,6 +33,8 @@ export default function BookForm({
 
     function setCoverImageUrl(url) {
         setForm((prev) => ({ ...prev, coverImageUrl: url }))
+        setIsUnsavedCover(true)
+        onCoverChange?.(true)
     }
 
     function handleCancel(event) {

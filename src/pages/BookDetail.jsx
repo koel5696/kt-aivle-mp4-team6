@@ -1,9 +1,10 @@
 import { useState } from 'react'
 import { Link, useNavigate, useParams } from 'react-router-dom'
-import { deleteBook } from '../api/books.js'
+import { deleteBook, updateBook } from '../api/books.js'
 import {downloadCover} from '../api/images.js'
 import useBook from '../hooks/useBook.js'
 import { useToast } from '../contexts/ToastContext.js'
+import CoverGenerator from '../components/CoverGenerator.jsx'
 import '../styles/BookDetail.css'
 import NotFound from './NotFound.jsx'
 
@@ -22,6 +23,9 @@ export default function BookDetail() {
   const toast = useToast()
   const { book, loading, error: loadError } = useBook(id)
   const [deleting, setDeleting] = useState(false)
+  const [isGenerating, setIsGenerating] = useState(false)
+  // 방금 생성한 표지 (새로고침 없이 바로 보여주기 위함)
+  const [newCover, setNewCover] = useState(null)
 
   async function handleDelete() {
     if (!book || !window.confirm(`「${book.title}」을(를) 삭제할까요?`)) return
@@ -47,7 +51,19 @@ export default function BookDetail() {
     return <NotFound title="도서를 찾을 수 없어요" desc="삭제되었거나 존재하지 않는 도서예요." />
   }
 
-  const coverImageUrl =  book.coverImageUrl
+  const coverImageUrl = newCover ?? book.coverImageUrl
+
+  // 상세 화면에서는 생성 즉시 저장
+  async function handleCoverGenerated(dataUrl) {
+    try {
+      await updateBook(book.id, { coverImageUrl: dataUrl })
+    } catch (err) {
+      throw new Error(`표지는 만들었지만 저장하지 못했어요 (${err.message})`)
+    }
+    setNewCover(dataUrl)
+  }
+
+  const isEdited = book.updatedAt && book.updatedAt !== book.createdAt
 
   return (
     <div className="book-detail-section">
@@ -77,7 +93,7 @@ export default function BookDetail() {
                 <dt>등록일</dt>
                 <dd>{formatDate(book.createdAt)}</dd>
               </div>
-              {(
+              {isEdited && (
                 <div>
                   <dt>수정일</dt>
                   <dd>{formatDate(book.updatedAt)}</dd>
@@ -114,11 +130,22 @@ export default function BookDetail() {
               className="btn btn-danger"
               type="button"
               onClick={handleDelete}
-              disabled={deleting}
+              disabled={deleting || isGenerating}
             >
               {deleting ? '삭제 중…' : '삭제'}
             </button>
           </div>
+
+          <CoverGenerator
+              title={book.title}
+              author={book.author}
+              content={book.content}
+              hasCover={Boolean(coverImageUrl)}
+              onGenerated={handleCoverGenerated}
+              onBusyChange={setIsGenerating}
+              successMessage="AI 표지를 저장했어요"
+              description="제목·지은이·책 소개를 바탕으로 표지를 그려요. API 키는 저장되지 않아요."
+            />
         </div>
       </section>
     </div>
