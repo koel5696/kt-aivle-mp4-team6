@@ -30,18 +30,14 @@ export default function BookCreate() {
       return
     }
 
-    //커버 이미지 없이 새로운 책 등록 금지
-    if (!next.coverImageUrl) {
-      setError('표지 이미지를 생성해 주세요.')
-      return
-    }
-
     setSubmitting(true)
     setError(null)
 
     try {
+      
       await createBook(next)
       toast.success(`「${next.title}」을(를) 등록했어요`)
+
       navigate('/')
     } catch (err) {
       toast.error(`도서 등록에 실패했어요 (${err.message})`)
