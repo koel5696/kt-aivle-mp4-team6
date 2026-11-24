@@ -59,28 +59,32 @@ export default function BookList() {
   const [appliedCoverFilter, setAppliedCoverFilter] = useState('all')
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState(null)
-
+  
   useEffect(() => {
     let cancelled = false
 
-    getBooks()
-      .then((data) => {
+    // 교안 패턴: useEffect 안에 비동기 함수를 만들고 바로 호출
+    async function loadBooks() {
+      try {
+        const data = await getBooks()
         if (cancelled) return
         setBooks(Array.isArray(data) ? data : [])
         setError(null)
-      })
-      .catch((err) => {
+      } catch (err) {
         if (!cancelled) setError(err.message)
-      })
-      .finally(() => {
+      } finally {
         if (!cancelled) setLoading(false)
-      })
+      }
+    }
+
+    loadBooks()
 
     return () => {
       cancelled = true
     }
   }, [])
 
+  
   const filteredBooks = useMemo(() => {
     const keyword = appliedQuery.trim().toLocaleLowerCase()
 
