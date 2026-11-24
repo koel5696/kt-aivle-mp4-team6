@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { updateBook } from '../api/books.js'
-import {  uploadCover } from '../api/images.js'
 import useBook from '../hooks/useBook.js'
 import BookForm from '../components/BookForm.jsx'
 import { useToast } from '../contexts/ToastContext.js'
@@ -38,7 +37,6 @@ export default function BookEdit() {
 function BookEditForm({ book }) {
   const navigate = useNavigate()
   const toast = useToast()
-  const [isUnsavedCover, setIsUnsavedCover] = useState(false)
 
   const [form, setForm] = useState({
     title: book.title,
@@ -76,10 +74,7 @@ function BookEditForm({ book }) {
     setSubmitting(true)
     setError(null)
     try {
-      // 새로 생성한 표지는 저장할 때 이미지 서버에 올림 (저장하지 않고 나가면 버려짐)
-      if (isUnsavedCover) {
-        patch.coverImageUrl = await uploadCover(book.id, patch.coverImageUrl)
-      }
+      // 새로 생성한 표지도 바뀐 칸과 함께 한 번에 저장 (저장하지 않고 나가면 버려짐)
       await updateBook(book.id, patch)
       toast.success('수정 내용을 저장했어요')
       navigate(`/books/${book.id}`)
@@ -91,6 +86,6 @@ function BookEditForm({ book }) {
 
   return (
     <BookForm heading={"도서 수정"} form={form} setForm={setForm}
-      error={error} submitting={submitting} onSubmit={handleSubmit} onCoverChange={setIsUnsavedCover} />
+      error={error} submitting={submitting} onSubmit={handleSubmit} />
   )
 }
