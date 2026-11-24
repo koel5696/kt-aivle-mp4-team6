@@ -45,6 +45,12 @@ function chunk(items, size) {
   return result
 }
 
+function getTimestamp(book) {
+  const value = book.updatedAt || book.createdAt
+  const time = value ? new Date(value).getTime() : NaN
+  return Number.isNaN(time) ? 0 : time
+}
+
 export default function BookList() {
   const [searchParams, setSearchParams] = useSearchParams()
   const page = Math.max(1, Number.parseInt(searchParams.get('page'), 10) || 1)
@@ -103,7 +109,7 @@ export default function BookList() {
 
         return matchesSearch && matchesCover
       })
-      .sort((a, b) => Number(b.id) - Number(a.id))
+      .sort((a, b) => getTimestamp(b) - getTimestamp(a))
   }, [books, appliedQuery, appliedCoverFilter])
 
   const totalPages = Math.ceil(filteredBooks.length / pageSize)
