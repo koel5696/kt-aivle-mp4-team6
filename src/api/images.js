@@ -2,11 +2,6 @@ import { ApiError } from '../constants/http.js'
 
 const IMAGE_SERVER = 'http://localhost:3000'
 
-// 아직 저장되지 않은 표지(Data URL)인지 확인
-export function isUnsavedCover(url) {
-  return typeof url === 'string' && url.startsWith('data:')
-}
-
 // OpenAI base64 이미지를 json-server db.json 해당 book id에 patch
 export async function uploadCover(id, imgUrl) {
   
